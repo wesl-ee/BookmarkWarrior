@@ -1,0 +1,52 @@
+body {
+	display: grid;
+	grid-template-areas:
+		'header aside'
+		'main aside'
+		'footer footer';
+	grid-template-columns: 1fr 250px;
+	grid-gap: 1rem;
+	font-family: Calibri, sans-serif;
+
+	/* Default colors... */
+	background-color: LightGray }
+body > main { grid-area: main }
+body > aside { grid-area: aside;
+	border-left: 1px solid }
+body > footer { grid-area: footer }
+body > header { grid-area: header }
+body > main,
+body > aside,
+body > footer,
+body > header { padding: 10px 20px }
+.bigish { font-size: 1.5rem }
+#big-title { font-size: 2.5rem }
+
+.button-group { display: flex;
+	flex-wrap: wrap }
+.button-group > * { padding: 0 8px }
+.remarkable.button-group > * { border: 1px solid;
+	background-color: White }
+.simple .button-group { }
+
+input[readonly] {
+	background-color: inherit;
+	border: none;
+}
+
+.error { color: red }
+
+/* Layouts */
+body > header { display: flex;
+	align-items: flex-end;
+	justify-content: space-between }
+table { width: 100% }
+.displayname { margin: 10px 0 }
+th { text-align: left }
+
+.bookmarks tr > :last-child { float: right }
+
+/* Mobile... */
+@media only screen and (max-width: 800px) {
+	body { display: block }
+	header { display: block } }

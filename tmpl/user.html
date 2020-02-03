@@ -1,0 +1,28 @@
+<!DOCTYPE HTML>
+<html>
+<head>{{template "Head" .}}</head>
+<body>
+<header><title>{{.Title}}</title>
+{{template "Header" .}}</header>
+<aside><h1 class=displayname>{{.User.DisplayName}}</h1>
+<span class="username subtext">{{.User.Username}}</span>
+<p>User since {{.User.JoinedOn}}</p></aside>
+<main>
+{{if .User.ThisIsMe}}Add{{end}}
+{{if not .User.Bookmarks}}
+<p>No bookmarks...</p>
+{{else}}<table class=bookmarks>
+<tr><th>Name</th><th>Added on</th>{{if .User.ThisIsMe}}<th>Actions</th>{{end}}{{range .User.Bookmarks}}</tr>
+<tr><td><a href="{{.URL}}">{{.Title}}</a></td>
+<td>{{.AddedOn}}</td>
+{{if $.User.ThisIsMe}}<td class="simple button-group">
+	<span class=read><a href>Mark as Read</a></span>
+	<span class=edit><a href>Edit</a></span>
+	<span class=archive><a href>Archive</a></span>
+	<span class=remove><a href>Remove</a></span></td>{{end}}</tr>
+{{end}}{{end}}
+</table>
+</main>
+<footer>{{template "Footer" .}}</footer>
+</body>
+</html>

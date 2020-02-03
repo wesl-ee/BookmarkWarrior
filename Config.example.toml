@@ -1,0 +1,51 @@
+MinimumPasswordLength = 6
+
+[Web]
+Canon = "https://bookmarkwarrior.com/"
+Host = ":9001"
+SessionCookie = "Session"
+
+[PayPal]
+OAuthAPI = "https://api.sandbox.paypal.com/v1/oauth2/token/"
+OrderAPI = "https://api.sandbox.paypal.com/v2/checkout/orders/"
+Client = "MYPAYPALCLIENTID"
+Secret = "MYPAYPALSECRET"
+OneTimeCost = 10.00
+DomesticCurrency = "USD"
+
+[Database]
+ConnectionString = "bookmarkboy:password@tcp(localhost)/bookmarkwarrior"
+
+# html/template dependencies
+[[Templates]]
+Name = "tmpl/index.html"
+Dependencies = [ "tmpl/head.html",
+	"tmpl/footer.html",
+	"tmpl/signup-steps.html" ]
+
+[[Templates]]
+Name = "tmpl/user.html"
+Dependencies = [ "tmpl/head.html",
+	"tmpl/footer.html",
+	"tmpl/header.html" ]
+
+[[Templates]]
+Name = "tmpl/signup-new.html"
+Dependencies = [ "tmpl/head.html",
+	"tmpl/footer.html",
+	"tmpl/header.html",
+	"tmpl/signup-steps.html" ]
+
+[[Templates]]
+Name = "tmpl/signup-create.html"
+Dependencies = [ "tmpl/head.html",
+	"tmpl/footer.html",
+	"tmpl/header.html",
+	"tmpl/signup-steps.html" ]
+
+[[Templates]]
+Name = "tmpl/signup-receipt.html"
+Dependencies = [ "tmpl/head.html",
+	"tmpl/footer.html",
+	"tmpl/signup-steps.html",
+	"tmpl/header.html" ]

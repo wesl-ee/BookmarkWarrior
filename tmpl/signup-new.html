@@ -1,0 +1,38 @@
+<!DOCTYPE HTML>
+<html>
+<head><title>Sign-up for BookmarkWarrior!</title>
+{{template "Head" .}}</head>
+<body>
+<aside></aside>
+<header>{{template "Header" .}}</header>
+<main>
+<header class=signup-steps>{{template "SignupSteps" "New"}}</header>
+<header class=signup-steps>
+	<strong>Create</a></strong>
+	<span>Confirm</span>
+	<span>Pay</span>
+	<span>Receipt</span></header>
+{{if .Error}}<span class=error>
+	{{if .Error.Taken}}That username is already taken!{{end}}
+	{{if .Error.AlreadyLoggedIn}}You're already logged in!{{end}}
+	{{if .Error.Mismatch}}Passwords didn't match!{{end}}
+	{{if .Error.BadUName}}Bad username (letters, hyphens and numbers only!){{end}}
+	{{if .Error.ShortPassword}}Password is too short!{{end}}
+</span>{{end}}
+<form method=post action="{{.Settings.Web.Canon}}signup/create">
+	<div><label for=username>Username: <abbr title=Required
+		aria-label=Required>*</abbr></label>
+	<input id=username type=text name=username></div>
+	<div><label for=displayname>Display Name:</label>
+	<input id=displayname type=text name=displayname></div>
+	<div><label for=password>Password: <abbr title=Required
+		aria-label=Required>*</abbr></label>
+	<input id=password type=password name=password></div>
+	<div><label for=confirmpassword>Confirm Password: <abbr title=Required
+		aria-label=Required>*</abbr></label>
+	<input id=confirmpassword type=password name=confirmpassword></div>
+	<button type=submit>Create</button>
+</main>
+<footer>{{template "Footer" .}}</footer>
+</body>
+</html>
