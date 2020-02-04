@@ -5,7 +5,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-
 // Uplink to the Scrin mothership
 func DBConnect(c *Config) (db *sql.DB, err error) {
 	db, _ = sql.Open("mysql", c.Database.ConnectionString)
@@ -25,6 +24,12 @@ func UserByName(db *sql.DB, uname string) (u UserProfile, err error) {
 		&u.Shadow,
 		&u.APISecret)
 
+	/* if err == sql.ErrNoRows {
+		return
+	} else {
+		return
+	} */
+
 	return
 }
 
@@ -41,12 +46,12 @@ func SessByID(db *sql.DB, id string) (s Session, err error) {
 	return
 }
 
-func (u UserProfile) Bookmarks(db *sql.DB) (marks []Bookmark) {
+func (u UserProfile) Bookmarks(db *sql.DB) (marks []Bookmark, err error) {
 	q := `SELECT
 		BId, Username, URL, Title, Unread, Archived, AddedOn
 		FROM Bookmarks WHERE Username=?`
 	selForm, err := db.Prepare(q)
-	if err != nil { panic(err) }
+	if err != nil { return }
 	var m Bookmark
 	rows, err := selForm.Query(u.Username)
 	for rows.Next() { rows.Scan(

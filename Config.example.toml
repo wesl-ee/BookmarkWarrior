@@ -21,6 +21,7 @@ ConnectionString = "bookmarkboy:password@tcp(localhost)/bookmarkwarrior"
 Name = "tmpl/index.html"
 Dependencies = [ "tmpl/head.html",
 	"tmpl/footer.html",
+	"tmpl/header.html",
 	"tmpl/signup-steps.html" ]
 
 [[Templates]]

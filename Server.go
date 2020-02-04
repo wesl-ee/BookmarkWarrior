@@ -12,6 +12,7 @@ import (
 )
 
 var Settings Config
+var Templates = map[string]*template.Template{}
 
 func PageDependencies(page string) ([]string) {
 	for _, p := range Settings.Templates {
@@ -54,26 +55,36 @@ type SignupReceiptPage struct {
 	Settings *Config
 }
 
+func InitTemplates() {
+	for _, this := range Settings.Templates {
+		file := this.Name
+		incl := this.Dependencies
+		tmpl := template.Must(template.ParseFiles(file))
+		for _, t := range incl {
+			template.Must(tmpl.ParseFiles(t)) }
+		Templates[file] = tmpl
+	}
+}
+
 func HandleWebIndex(w http.ResponseWriter, r *http.Request) {
 	page := "tmpl/index.html"
 
-	incl := PageDependencies(page)
-	tmpl := template.Must(template.ParseFiles(page))
-	for _, t := range incl {
-		template.Must(tmpl.ParseFiles(t)) }
-	tmpl.Execute(w, IndexPage{
+	tmpl := Templates[page]
+	err := tmpl.Execute(w, IndexPage{
 		Settings: &Settings,
-		LoggedIn: false});
+		LoggedIn: false})
+	if err != nil {
+		HandleWebError(w, r, http.StatusInternalServerError)
+	}
 }
 
 func HandleUserReq(w http.ResponseWriter, r *http.Request, uname string) {
 	db, _ := DBConnect(&Settings)
 	page := "tmpl/user.html"
 
-	incl := PageDependencies(page)
-	tmpl := template.Must(template.ParseFiles(page))
 	user, err := UserByName(db, uname)
 	if err != nil {
+		log.Println(err)
 		// User not found...
 		HandleWebError(w, r, http.StatusNotFound)
 		return }
@@ -89,12 +100,16 @@ func HandleUserReq(w http.ResponseWriter, r *http.Request, uname string) {
 	webuser.Bookmarks = marks
 	webuser.ThisIsMe = false
 
-	for _, t := range incl { tmpl.ParseFiles(t) }
-	tmpl.Execute(w, UserPage{
+	tmpl := Templates[page]
+	err = tmpl.Execute(w, UserPage{
 		Settings: &Settings,
 		User: webuser,
 		LoggedIn: false,
 		Title: user.DisplayName + " (" + uname + ") - Bookmarks" })
+
+	if err != nil {
+		HandleWebError(w, r, http.StatusInternalServerError)
+	}
 }
 
 func HandleStatic(w http.ResponseWriter, r *http.Request) {
@@ -106,13 +121,14 @@ func HandleStatic(w http.ResponseWriter, r *http.Request) {
 func HandleSignupNew(w http.ResponseWriter, r *http.Request, e *SignupError) {
 	page := "tmpl/signup-new.html"
 
-	incl := PageDependencies(page)
-	tmpl := template.Must(template.ParseFiles(page))
-	for _, t := range incl { tmpl.ParseFiles(t) }
-	tmpl.Execute(w, SignupNewPage{
+	tmpl := Templates[page]
+	err := tmpl.Execute(w, SignupNewPage{
 		Error: e,
 		LoggedIn: false,
 		Settings: &Settings })
+	if err != nil {
+		HandleWebError(w, r, http.StatusInternalServerError)
+	}
 }
 
 // 2nd step in acc creation...
@@ -161,15 +177,16 @@ func HandleSignupCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	incl := PageDependencies(page)
-	tmpl := template.Must(template.ParseFiles(page))
-	for _, t := range incl { tmpl.ParseFiles(t) }
-	tmpl.Execute(w, SignupCreatePage{
+	tmpl := Templates[page]
+	err = tmpl.Execute(w, SignupCreatePage{
 		Username: username,
 		DisplayName: displayname,
 		Password: password,
 		LoggedIn: false,
 		Settings: &Settings })
+	if err != nil {
+		HandleWebError(w, r, http.StatusInternalServerError)
+	}
 }
 
 // 3rd step in acc creation...
@@ -217,23 +234,14 @@ func HandleSignupPay(w http.ResponseWriter, r *http.Request) {
 func HandleSignupReceipt(w http.ResponseWriter, r *http.Request) {
 	page := "tmpl/signup-receipt.html"
 
-	incl := PageDependencies(page)
-	tmpl := template.Must(template.ParseFiles(page))
-	for _, t := range incl { tmpl.ParseFiles(t) }
-	tmpl.Execute(w, SignupReceiptPage{
+	tmpl := Templates[page]
+	err := tmpl.Execute(w, SignupReceiptPage{
 		LoggedIn: false,
 		Settings: &Settings })
+	if err != nil {
+		HandleWebError(w, r, http.StatusInternalServerError)
+	}
 }
-
-/* func HandleSignup(w http.ResponseWriter, r *http.Request, step string) {
-	page := "tmpl/signup.html"
-
-	incl := PageDependencies(page)
-	tmpl := template.Must(template.ParseFiles(page))
-	for _, t := range incl { tmpl.ParseFiles(t) }
-	tmpl.Execute(w, SignupPage{
-		LoggedIn: false,
-		Settings: &Settings }) */
 
 func HandleReq(w http.ResponseWriter, r *http.Request) {
 	const serveDir string = "/"
@@ -328,6 +336,8 @@ func HandleReq(w http.ResponseWriter, r *http.Request) {
 func main() {
 	err := ReadDefaultConfig(&Settings)
 	if err != nil { panic(err) }
+
+	InitTemplates()
 
 	log.Println("Starting server...")
 
