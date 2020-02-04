@@ -73,11 +73,20 @@ func HandleUserReq(w http.ResponseWriter, r *http.Request, uname string) {
 	incl := PageDependencies(page)
 	tmpl := template.Must(template.ParseFiles(page))
 	user, err := UserByName(db, uname)
-	if err != nil { HandleWebError(w, r, http.StatusNotFound)
+	if err != nil {
+		// User not found...
+		HandleWebError(w, r, http.StatusNotFound)
 		return }
 
-	webuser := user.AsWebEntity()
-	webuser.Bookmarks = user.Bookmarks(db)
+	marks, err := user.Bookmarks(db)
+	if err != nil {
+		// Databse error...
+		HandleWebError(w, r, http.StatusServiceUnavailable)
+		return
+	}
+
+	webuser:= user.AsWebEntity()
+	webuser.Bookmarks = marks
 	webuser.ThisIsMe = false
 
 	for _, t := range incl { tmpl.ParseFiles(t) }
@@ -337,6 +346,8 @@ func HandleWebError(w http.ResponseWriter, r *http.Request, status int) {
 		fmt.Fprint(w, "Custom 400")
 	case http.StatusNoContent:
 		fmt.Fprint(w, "Custom 204")
+	case http.StatusServiceUnavailable:
+		fmt.Fprint(w, "Custom 503")
 	}
 }
 
