@@ -6,12 +6,7 @@
 <aside></aside>
 <header>{{template "Header" .}}</header>
 <main>
-<header class=signup-steps>{{template "SignupSteps" "New"}}</header>
-<header class=signup-steps>
-	<strong>Create</a></strong>
-	<span>Confirm</span>
-	<span>Pay</span>
-	<span>Receipt</span></header>
+<header class=signup-steps>{{template "SignupSteps" 1}}</header>
 {{if .Error}}<span class=error>
 	{{if .Error.Taken}}That username is already taken!{{end}}
 	{{if .Error.AlreadyLoggedIn}}You're already logged in!{{end}}

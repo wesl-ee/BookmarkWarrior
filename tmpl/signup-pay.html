@@ -6,11 +6,7 @@
 <aside></aside>
 <header>{{template "Header" .}}</header>
 <main>
-<header class=signup-steps>
-	<span>Create</span>
-	<strong>Confirm</strong>
-	<span>Pay</span>
-	<span>Receipt</span></header>
+<header class=signup-steps>{{template "SignupSteps" 3}}</header>
 <form method=post action="{{.Settings.Web.Canon}}signup/pay" id=confirm>
 	<div><label for=username>Username: <abbr title=Required
 		aria-label=Required>*</abbr></label>

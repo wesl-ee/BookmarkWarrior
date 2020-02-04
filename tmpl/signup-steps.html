@@ -1,7 +1,14 @@
 {{define "SignupSteps"}}
-{{if .}}<strong>Create</strong>
-{{else}}<span>Create</span>{{end}}
-	<span>Confirm</span>
-	<span>Pay</span>
-	<span>Receipt</span>
+{{if eq . 1}}<strong>{{else}}<span>{{end}}
+	Create
+{{if eq . 1}}</strong>{{else}}</span>{{end}}
+{{if eq . 2}}<strong>{{else}}<span>{{end}}
+	Confirm
+{{if eq . 2}}</strong>{{else}}</span>{{end}}
+{{if eq . 3}}<strong>{{else}}<span>{{end}}
+	Pay
+{{if eq . 3}}</strong>{{else}}</span>{{end}}
+{{if eq . 4}}<strong>{{else}}<span>{{end}}
+	Receipt
+{{if eq . 4}}</strong>{{else}}</span>{{end}}
 {{end}}
