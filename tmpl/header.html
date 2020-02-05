@@ -2,7 +2,9 @@
 <div><header id=big-title>BookmarkWarrior<span class=bigish>.com</span></header>
 <span class=subtext>Your ultra-minimal bookmark manager, on all your devices</span></div>
 <div class="remarkable button-group">
-<a href="{{.Settings.Web.Canon}}">Home</a>{{if not .LoggedIn}}<a
+<a href="{{.Settings.Web.Canon}}">Home</a>{{if not .UX.LoggedIn}}<a
 href="{{.Settings.Web.Canon}}/login">Login</a>
-<a href="{{.Settings.Web.Canon}}signup">Sign-up</a></div>{{end}}
+<a href="{{.Settings.Web.Canon}}signup">Sign-up</a></div>{{else}}
+<a href="{{.Settings.Web.Canon}}u/{{.UX.Username}}">My Bookmarks</a>
+<a href="{{.Settings.Web.Canon}}logout">Logout</a>{{end}}
 {{end}}
