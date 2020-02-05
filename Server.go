@@ -129,8 +129,7 @@ func (ux *UserExperience) HandleUserReq(res *ServerRes, uname string) {
 
 func (ux *UserExperience) HandleLogout(res *ServerRes) {
 	ws := ThisSession(res.Request)
-	err := ws.Disassociate(res.DB)
-	log.Println(err)
+	ws.Disassociate(res.DB)
 
 	http.Redirect(res.Writer, res.Request, "/", http.StatusSeeOther)
 }
@@ -154,6 +153,7 @@ func (ux *UserExperience) HandleLogin(res *ServerRes) {
 		ws := ThisSession(r)
 		ws.Associate(db, u.Username)
 
+		http.Redirect(res.Writer, res.Request, "/u/" + username, http.StatusSeeOther)
 		return
 	}
 
