@@ -1,12 +1,20 @@
 package main
 
 import (
+	"database/sql"
 	"net/http"
+	"log"
 	"strings"
 	"crypto/md5"
 	"encoding/base64"
 	"time"
 )
+
+type UserExperience struct {
+	SessID string
+	Username string
+	LoggedIn bool
+	Theme string }
 
 type Session struct {
 	SessID string
@@ -14,8 +22,7 @@ type Session struct {
 	Expires string }
 
 type WebSession struct {
-	SessID string
-}
+	SessID string }
 
 /* func LoadWebSession(db *sql.DB, r *http.Request) (ws WebSession, err error) {
 	id, err := r.Cookie(Settings.Web.SessionCookie)
@@ -24,6 +31,28 @@ type WebSession struct {
 
 	ws.SessID = s.SessID
 } */
+
+func (UX *UserExperience) LoadSession(s Session) {
+	UX.SessID = s.SessID
+	UX.Username = s.Username
+	UX.LoggedIn = true
+}
+
+func (UX *UserExperience) LoadGeneric(ws WebSession) {
+	UX.SessID = ws.SessID
+	UX.LoggedIn = false
+}
+
+func LoadUX(db *sql.DB, r *http.Request) (*UserExperience) {
+	UX := &UserExperience{}
+	ws := ThisSession(r)
+	s, err := ws.Associated(db)
+	log.Println(err)
+	log.Println(ws.SessID)
+	if err != nil { UX.LoadGeneric(ws)
+	} else { UX.LoadSession(s) }
+	return UX
+}
 
 func InitWebSession(w http.ResponseWriter, r *http.Request) {
 	sesscookie := http.Cookie{
@@ -40,6 +69,12 @@ func InitWebSession(w http.ResponseWriter, r *http.Request) {
 func HasWebSession(r *http.Request) (bool) {
 	_, err := r.Cookie(Settings.Web.SessionCookie)
 	return err == nil
+}
+
+func ThisSession(r *http.Request) (WebSession) {
+	cookie, err := r.Cookie(Settings.Web.SessionCookie)
+	if err != nil { panic(err) }
+	return WebSession{ SessID: cookie.Value }
 }
 
 func DeriveSessID(r *http.Request) (string) {

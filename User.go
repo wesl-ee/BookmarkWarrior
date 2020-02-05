@@ -36,12 +36,15 @@ func DoShadow(password string) (string) {
 	return string(hash)
 }
 
+func CompareShadow(shadow, password string) (error) {
+	fail := bcrypt.CompareHashAndPassword([]byte(shadow), []byte(password))
+	return fail
+}
+
 func APISecret() (string) {
 	length := 15
 	bytes := make([]byte, length)
-	_, err := rand.Read(bytes)
-
-	if err != nil { panic(err) }
+	rand.Read(bytes)
 
 	return hex.EncodeToString(bytes)
 }

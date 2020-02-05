@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"fmt"
 	"strings"
+	"database/sql"
 	_ "golang.org/x/crypto/bcrypt"
 )
 
@@ -22,13 +23,17 @@ func PageDependencies(page string) ([]string) {
 }
 
 type IndexPage struct {
+	UX *UserExperience
+	Settings *Config }
+
+type LoginPage struct {
 	Settings *Config
-	LoggedIn bool }
+	UX *UserExperience }
 
 type UserPage struct {
 	Settings *Config
 	User WebUserProfile
-	LoggedIn bool
+	UX *UserExperience
 	Title string }
 
 type SignupError struct {
@@ -41,18 +46,25 @@ type SignupError struct {
 type SignupNewPage struct {
 	LoggedIn bool
 	Settings *Config
+	UX *UserExperience
 	Error *SignupError}
 
 type SignupCreatePage struct {
 	Username string
 	DisplayName string
 	Password string
-	LoggedIn bool
+	UX *UserExperience
 	Settings *Config }
 
 type SignupReceiptPage struct {
-	LoggedIn bool
+	UX *UserExperience
 	Settings *Config
+}
+
+type ServerRes struct {
+	DB *sql.DB
+	Writer http.ResponseWriter
+	Request *http.Request
 }
 
 func InitTemplates() {
@@ -66,25 +78,28 @@ func InitTemplates() {
 	}
 }
 
-func HandleWebIndex(w http.ResponseWriter, r *http.Request) {
+func (ux *UserExperience) HandleWebIndex(res *ServerRes) {
+	w := res.Writer
+	r := res.Request
 	page := "tmpl/index.html"
 
 	tmpl := Templates[page]
 	err := tmpl.Execute(w, IndexPage{
 		Settings: &Settings,
-		LoggedIn: false})
+		UX: ux})
 	if err != nil {
 		HandleWebError(w, r, http.StatusInternalServerError)
 	}
 }
 
-func HandleUserReq(w http.ResponseWriter, r *http.Request, uname string) {
-	db, _ := DBConnect(&Settings)
+func (ux *UserExperience) HandleUserReq(res *ServerRes, uname string) {
+	w := res.Writer
+	r := res.Request
+	db := res.DB
 	page := "tmpl/user.html"
 
 	user, err := UserByName(db, uname)
 	if err != nil {
-		log.Println(err)
 		// User not found...
 		HandleWebError(w, r, http.StatusNotFound)
 		return }
@@ -104,7 +119,7 @@ func HandleUserReq(w http.ResponseWriter, r *http.Request, uname string) {
 	err = tmpl.Execute(w, UserPage{
 		Settings: &Settings,
 		User: webuser,
-		LoggedIn: false,
+		UX: ux,
 		Title: user.DisplayName + " (" + uname + ") - Bookmarks" })
 
 	if err != nil {
@@ -112,13 +127,47 @@ func HandleUserReq(w http.ResponseWriter, r *http.Request, uname string) {
 	}
 }
 
-func HandleStatic(w http.ResponseWriter, r *http.Request) {
+func (ux *UserExperience) HandleLogin(res *ServerRes) {
+	w := res.Writer
+	r := res.Request
+	db := res.DB
+	page := "tmpl/login.html"
+	tmpl := Templates[page]
+
+	// Handle login attempts
+	if (r.Method == "POST") {
+		if err := r.ParseForm(); err != nil { panic(err) }
+		username := strings.ToLower(r.FormValue("username"))
+		password := r.FormValue("password")
+
+		u, err := LetMeIn(db, username, password)
+		if err != nil { panic(err) }
+
+		ws := ThisSession(r)
+		ws.Associate(db, u.Username)
+
+		return
+	}
+
+	err := tmpl.Execute(w, LoginPage{
+		UX: ux,
+		Settings: &Settings })
+	if err != nil {
+		HandleWebError(w, r, http.StatusInternalServerError)
+	}
+}
+
+func HandleStatic(res *ServerRes) {
+	w := res.Writer
+	r := res.Request
 	http.ServeFile(w, r, "static/" + strings.TrimPrefix(
 		r.URL.Path, "/static/"))
 }
 
 // 1st step in acc creation...
-func HandleSignupNew(w http.ResponseWriter, r *http.Request, e *SignupError) {
+func (ux *UserExperience) HandleSignupNew(res *ServerRes, e *SignupError) {
+	w := res.Writer
+	r := res.Request
 	page := "tmpl/signup-new.html"
 
 	tmpl := Templates[page]
@@ -132,8 +181,10 @@ func HandleSignupNew(w http.ResponseWriter, r *http.Request, e *SignupError) {
 }
 
 // 2nd step in acc creation...
-func HandleSignupCreate(w http.ResponseWriter, r *http.Request) {
-	db, _ := DBConnect(&Settings)
+func (ux *UserExperience) HandleSignupCreate(res *ServerRes) {
+	w := res.Writer
+	r := res.Request
+	db := res.DB
 	page := "tmpl/signup-create.html"
 
 	// Parse form submission
@@ -154,26 +205,26 @@ func HandleSignupCreate(w http.ResponseWriter, r *http.Request) {
 
 	if len(password) < Settings.MinimumPasswordLength {
 		w.WriteHeader(http.StatusUnprocessableEntity)
-		HandleSignupNew(w, r, &SignupError{ShortPassword: true})
+		ux.HandleSignupNew(res, &SignupError{ShortPassword: true})
 		return
 	}
 
 	if !ValidUsername(username) {
 		w.WriteHeader(http.StatusUnprocessableEntity)
-		HandleSignupNew(w, r, &SignupError{BadUName: true})
+		ux.HandleSignupNew(res, &SignupError{BadUName: true})
 		return
 	}
 
 	existing, err := UserByName(db, username)
 	if err == nil && existing.Username == username {
 		w.WriteHeader(http.StatusConflict)
-		HandleSignupNew(w, r, &SignupError{Taken: true})
+		ux.HandleSignupNew(res, &SignupError{Taken: true})
 		return
 	}
 
 	if confirmpassword != password {
 		w.WriteHeader(http.StatusUnprocessableEntity)
-		HandleSignupNew(w, r, &SignupError{Mismatch: true})
+		ux.HandleSignupNew(res, &SignupError{Mismatch: true})
 		return
 	}
 
@@ -182,7 +233,7 @@ func HandleSignupCreate(w http.ResponseWriter, r *http.Request) {
 		Username: username,
 		DisplayName: displayname,
 		Password: password,
-		LoggedIn: false,
+		UX: ux,
 		Settings: &Settings })
 	if err != nil {
 		HandleWebError(w, r, http.StatusInternalServerError)
@@ -190,7 +241,10 @@ func HandleSignupCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 // 3rd step in acc creation...
-func HandleSignupPay(w http.ResponseWriter, r *http.Request) {
+func (ux *UserExperience) HandleSignupPay(res *ServerRes) {
+	w := res.Writer
+	r := res.Request
+	db := res.DB
 
 	// Parse form submission
 	if (r.Method != "POST") {
@@ -209,7 +263,6 @@ func HandleSignupPay(w http.ResponseWriter, r *http.Request) {
 	if err != nil { panic(err) }
 
 	if paid {
-		db, _ := DBConnect(&Settings)
 		// Actually create account in DB
 		// ...
 		newUser := UserProfile{
@@ -231,12 +284,14 @@ func HandleSignupPay(w http.ResponseWriter, r *http.Request) {
 }
 
 // 4th step in acc creation...
-func HandleSignupReceipt(w http.ResponseWriter, r *http.Request) {
+func (ux *UserExperience) HandleSignupReceipt(res *ServerRes) {
+	w := res.Writer
+	r := res.Request
 	page := "tmpl/signup-receipt.html"
 
 	tmpl := Templates[page]
 	err := tmpl.Execute(w, SignupReceiptPage{
-		LoggedIn: false,
+		UX: ux,
 		Settings: &Settings })
 	if err != nil {
 		HandleWebError(w, r, http.StatusInternalServerError)
@@ -246,6 +301,7 @@ func HandleSignupReceipt(w http.ResponseWriter, r *http.Request) {
 func HandleReq(w http.ResponseWriter, r *http.Request) {
 	const serveDir string = "/"
 	dispatchers := map[string]bool {
+		"login": true,
 		"signup": true,
 		"static": true,
 		"u": true }
@@ -271,14 +327,7 @@ func HandleReq(w http.ResponseWriter, r *http.Request) {
 		InitWebSession(w, r)
 	}
 
-	// Top-level index page should redirect to a search bar
-	if dispatcher == "" {
-		/* http.Redirect(w, r,
-			serveDir + "about", http.StatusMovedPermanently)
-		return */
-		HandleWebIndex(w, r)
-		return
-	}
+
 
 	// Trailing slashes are non-canonical resources
 	if hasTrailingSlash {
@@ -294,6 +343,23 @@ func HandleReq(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Load the user experience...
+	db, _ := DBConnect(&Settings)
+	ux := LoadUX(db, r)
+	res := &ServerRes{
+		DB: db,
+		Writer: w,
+		Request: r}
+
+	// Top-level index page should redirect to a search bar
+	if dispatcher == "" {
+		/* http.Redirect(w, r,
+			serveDir + "about", http.StatusMovedPermanently)
+		return */
+		ux.HandleWebIndex(res)
+		return
+	}
+
 	switch(dispatcher) {
 	case "signup":
 		switch(len(args)) {
@@ -306,28 +372,30 @@ func HandleReq(w http.ResponseWriter, r *http.Request) {
 
 			switch(step) {
 			case "new":
-				HandleSignupNew(w, r, nil)
+				ux.HandleSignupNew(res, nil)
 			case "create":
-				HandleSignupCreate(w, r)
+				ux.HandleSignupCreate(res)
 			case "pay":
-				HandleSignupPay(w, r)
+				ux.HandleSignupPay(res)
 			case "receipt":
-				HandleSignupReceipt(w, r)
+				ux.HandleSignupReceipt(res)
 			default:
 				HandleWebError(w, r, http.StatusBadRequest)
 			}
 		}
+	case "login":
+		ux.HandleLogin(res)
 	case "u":
 		switch(len(args)) {
 		case 1:
 			uname := args[0]
 
-			HandleUserReq(w, r, uname)
+			ux.HandleUserReq(res, uname)
 		default:
 			HandleWebError(w, r, http.StatusBadRequest)
 		}
 	case "static":
-		HandleStatic(w, r)
+		HandleStatic(res)
 	default:
 		HandleWebError(w, r, http.StatusNotFound)
 	}

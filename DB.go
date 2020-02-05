@@ -33,17 +33,27 @@ func UserByName(db *sql.DB, uname string) (u UserProfile, err error) {
 	return
 }
 
-func SessByID(db *sql.DB, id string) (s Session, err error) {
+
+func (ws WebSession) Associated(db *sql.DB) (s Session, err error) {
 	selForm, err := db.Prepare(`SELECT
 		SessID, Username, Expires
 		FROM Sessions WHERE SessID=?`)
 	if err != nil { return }
-	err = selForm.QueryRow(id).Scan(
+	err = selForm.QueryRow(ws.SessID).Scan(
 		&s.SessID,
 		&s.Username,
 		&s.Expires)
 
 	return
+}
+
+func (ws WebSession) Associate(db *sql.DB, uname string) (error) {
+	q := `INSERT INTO Sessions
+		(SessID, Username) VALUES (?, ?)`
+	insForm, err := db.Prepare(q)
+	if err != nil { return err }
+	_, err = insForm.Exec(ws.SessID, uname)
+	return err
 }
 
 func (u UserProfile) Bookmarks(db *sql.DB) (marks []Bookmark, err error) {
@@ -85,4 +95,14 @@ func (u UserProfile) Create(db *sql.DB, pass string) (UserProfile, error) {
 	if err != nil { return UserProfile{}, err }
 
 	return UserByName(db, u.Username)
+}
+
+func LetMeIn(db *sql.DB, uname, pass string) (UserProfile, error) {
+	u, err := UserByName(db, uname)
+	if err != nil { return u, err }
+
+	fail := CompareShadow(u.Shadow, pass)
+	if fail != nil { return u, err }
+
+	return u, nil
 }
