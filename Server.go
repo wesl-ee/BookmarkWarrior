@@ -127,6 +127,14 @@ func (ux *UserExperience) HandleUserReq(res *ServerRes, uname string) {
 	}
 }
 
+func (ux *UserExperience) HandleLogout(res *ServerRes) {
+	ws := ThisSession(res.Request)
+	err := ws.Disassociate(res.DB)
+	log.Println(err)
+
+	http.Redirect(res.Writer, res.Request, "/", http.StatusSeeOther)
+}
+
 func (ux *UserExperience) HandleLogin(res *ServerRes) {
 	w := res.Writer
 	r := res.Request
@@ -302,6 +310,7 @@ func HandleReq(w http.ResponseWriter, r *http.Request) {
 	const serveDir string = "/"
 	dispatchers := map[string]bool {
 		"login": true,
+		"logout": true,
 		"signup": true,
 		"static": true,
 		"u": true }
@@ -327,22 +336,6 @@ func HandleReq(w http.ResponseWriter, r *http.Request) {
 		InitWebSession(w, r)
 	}
 
-
-
-	// Trailing slashes are non-canonical resources
-	if hasTrailingSlash {
-		http.Redirect(w, r, strings.TrimRight(r.URL.Path, "/"),
-			http.StatusMovedPermanently)
-		return
-	}
-
-	validCall := dispatchers[dispatcher]
-	// Undefined func call
-	if !validCall {
-		HandleWebError(w, r, http.StatusNotFound)
-		return
-	}
-
 	// Load the user experience...
 	db, _ := DBConnect(&Settings)
 	ux := LoadUX(db, r)
@@ -357,6 +350,20 @@ func HandleReq(w http.ResponseWriter, r *http.Request) {
 			serveDir + "about", http.StatusMovedPermanently)
 		return */
 		ux.HandleWebIndex(res)
+		return
+	}
+
+	validCall := dispatchers[dispatcher]
+	// Undefined func call
+	if !validCall {
+		HandleWebError(w, r, http.StatusNotFound)
+		return
+	}
+
+	// Trailing slashes are non-canonical resources
+	if hasTrailingSlash {
+		http.Redirect(w, r, strings.TrimRight(r.URL.Path, "/"),
+			http.StatusMovedPermanently)
 		return
 	}
 
@@ -385,6 +392,8 @@ func HandleReq(w http.ResponseWriter, r *http.Request) {
 		}
 	case "login":
 		ux.HandleLogin(res)
+	case "logout":
+		ux.HandleLogout(res)
 	case "u":
 		switch(len(args)) {
 		case 1:

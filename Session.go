@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"net/http"
-	"log"
 	"strings"
 	"crypto/md5"
 	"encoding/base64"
@@ -47,8 +46,6 @@ func LoadUX(db *sql.DB, r *http.Request) (*UserExperience) {
 	UX := &UserExperience{}
 	ws := ThisSession(r)
 	s, err := ws.Associated(db)
-	log.Println(err)
-	log.Println(ws.SessID)
 	if err != nil { UX.LoadGeneric(ws)
 	} else { UX.LoadSession(s) }
 	return UX
@@ -63,6 +60,15 @@ func InitWebSession(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &sesscookie)
 
 	// ...and set cookie in the current request to avoid refreshes
+	r.AddCookie(&sesscookie)
+}
+
+func (ws WebSession) ForgetMe(w http.ResponseWriter, r *http.Request) {
+	sesscookie := http.Cookie{
+		Name: Settings.Web.SessionCookie,
+		Value: "",
+		Expires: time.Now() }
+	http.SetCookie(w, &sesscookie)
 	r.AddCookie(&sesscookie)
 }
 

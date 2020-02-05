@@ -56,6 +56,15 @@ func (ws WebSession) Associate(db *sql.DB, uname string) (error) {
 	return err
 }
 
+func (ws WebSession) Disassociate(db *sql.DB) (error) {
+	q := `DELETE FROM Sessions
+		WHERE SessID=?`
+	delForm, err := db.Prepare(q)
+	if err != nil { return err }
+	_, err = delForm.Exec(ws.SessID)
+	return err
+}
+
 func (u UserProfile) Bookmarks(db *sql.DB) (marks []Bookmark, err error) {
 	q := `SELECT
 		BId, Username, URL, Title, Unread, Archived, AddedOn
