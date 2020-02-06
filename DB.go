@@ -65,12 +65,31 @@ func (ws WebSession) Disassociate(db *sql.DB) (error) {
 	return err
 }
 
-func (u UserProfile) Bookmarks(db *sql.DB) (marks []Bookmark, err error) {
+func (b Bookmark) MarkRead(db *sql.DB) (error) {
+	q := `UPDATE Bookmarks SET Unread=False
+		WHERE BId=?`
+	upForm, err := db.Prepare(q)
+	if err != nil { return err }
+	_, err = upForm.Exec(b.BId)
+	return err
+}
+
+func (b Bookmark) MarkUnread(db *sql.DB) (error) {
+	q := `UPDATE Bookmarks SET Unread=true
+		WHERE BId=?`
+	upForm, err := db.Prepare(q)
+	if err != nil { return err }
+	_, err = upForm.Exec(b.BId)
+	return err
+}
+
+func (u UserProfile) Bookmarks(db *sql.DB) (map[int]Bookmark, error) {
+	marks := make(map[int]Bookmark)
 	q := `SELECT
 		BId, Username, URL, Title, Unread, Archived, AddedOn
 		FROM Bookmarks WHERE Username=?`
 	selForm, err := db.Prepare(q)
-	if err != nil { return }
+	if err != nil { return marks, err }
 	var m Bookmark
 	rows, err := selForm.Query(u.Username)
 	for rows.Next() { rows.Scan(
@@ -81,9 +100,9 @@ func (u UserProfile) Bookmarks(db *sql.DB) (marks []Bookmark, err error) {
 		&m.Unread,
 		&m.Archived,
 		&m.AddedOn)
-		marks = append(marks, m)
+		marks[m.BId] = m
 	}
-	return
+	return marks,err
 }
 
 func (u UserProfile) Create(db *sql.DB, pass string) (UserProfile, error) {

@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 	"html/template"
-	_ "strconv"
+	"strconv"
 	"net/url"
 	"fmt"
 	"strings"
@@ -31,6 +31,7 @@ type LoginPage struct {
 	UX *UserExperience }
 
 type UserPage struct {
+	Canon string
 	Settings *Config
 	User WebUserProfile
 	UX *UserExperience
@@ -112,11 +113,12 @@ func (ux *UserExperience) HandleUserReq(res *ServerRes, uname string) {
 
 	webuser:= user.AsWebEntity()
 	webuser.Bookmarks = marks
-	webuser.ThisIsMe = false
+	webuser.ThisIsMe = ux.Username == uname
 
 	tmpl := Templates[page]
 	err = tmpl.Execute(w, UserPage{
 		Settings: &Settings,
+		Canon: Settings.Web.Canon + "u/" + uname,
 		User: webuser,
 		UX: ux,
 		Title: user.DisplayName + " (" + uname + ") - Bookmarks" })
@@ -131,6 +133,38 @@ func (ux *UserExperience) HandleLogout(res *ServerRes) {
 	ws.Disassociate(res.DB)
 
 	http.Redirect(res.Writer, res.Request, "/", http.StatusSeeOther)
+}
+
+func (ux *UserExperience) HandleBMarkAction(res *ServerRes, uname string, bID int, action string) {
+	if ux.Username != uname {
+		HandleWebError(res.Writer, res.Request, http.StatusForbidden)
+		return
+	}
+
+	u, err := UserByName(res.DB, uname)
+	if err != nil { panic(err) }
+	marks, err := u.Bookmarks(res.DB)
+	if err != nil { panic(err) }
+	mark, isValid := marks[bID]
+	if !isValid {
+		HandleWebError(res.Writer, res.Request,
+			http.StatusNotFound)
+	}
+
+	switch(action) {
+		case "read":
+			mark.MarkRead(res.DB)
+		case "unread":
+			mark.MarkUnread(res.DB)
+		case "edit":
+		case "archive":
+		case "remove":
+		default:
+			HandleWebError(res.Writer, res.Request,
+				http.StatusMethodNotAllowed)
+			return
+	}
+	http.Redirect(res.Writer, res.Request, "/u/" + uname, http.StatusSeeOther)
 }
 
 func (ux *UserExperience) HandleLogin(res *ServerRes) {
@@ -395,6 +429,17 @@ func HandleReq(w http.ResponseWriter, r *http.Request) {
 		ux.HandleLogout(res)
 	case "u":
 		switch(len(args)) {
+		case 3:
+			uname := args[0]
+			bID, err := strconv.Atoi(args[1])
+			action := args[2]
+
+			if err != nil {
+				HandleWebError(w, r, http.StatusBadRequest)
+				return
+			}
+
+			ux.HandleBMarkAction(res, uname, bID, action)
 		case 1:
 			uname := args[0]
 
@@ -434,6 +479,10 @@ func HandleWebError(w http.ResponseWriter, r *http.Request, status int) {
 		fmt.Fprint(w, "Custom 204")
 	case http.StatusServiceUnavailable:
 		fmt.Fprint(w, "Custom 503")
+	case http.StatusForbidden:
+		fmt.Fprint(w, "Custom 403")
+	case http.StatusMethodNotAllowed:
+		fmt.Fprint(w, "Custom 405")
 	}
 }
 
