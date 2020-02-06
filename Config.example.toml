@@ -4,6 +4,7 @@ MinimumPasswordLength = 6
 Canon = "https://bookmarkwarrior.com/"
 Host = ":9001"
 SessionCookie = "Session"
+SessionExpiryDays = 14
 
 [PayPal]
 OAuthAPI = "https://api.sandbox.paypal.com/v1/oauth2/token/"
@@ -26,6 +27,12 @@ Dependencies = [ "tmpl/head.html",
 
 [[Templates]]
 Name = "tmpl/user.html"
+Dependencies = [ "tmpl/head.html",
+	"tmpl/footer.html",
+	"tmpl/header.html" ]
+
+[[Templates]]
+Name = "tmpl/login.html"
 Dependencies = [ "tmpl/head.html",
 	"tmpl/footer.html",
 	"tmpl/header.html" ]

@@ -29,6 +29,7 @@ type PayPalSettings struct {
 type WebSettings struct {
 	Canon string
 	SessionCookie string
+	SessionExpiryDays int
 	Host string }
 
 const SYSDEFAULT_CONFIG string = "Config.toml"

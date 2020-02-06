@@ -52,8 +52,11 @@ func LoadUX(db *sql.DB, r *http.Request) (*UserExperience) {
 }
 
 func InitWebSession(w http.ResponseWriter, r *http.Request) {
+	now := time.Now()
+	afterHours := time.Duration(24 * Settings.Web.SessionExpiryDays)
 	sesscookie := http.Cookie{
 		Name: Settings.Web.SessionCookie,
+		Expires: now.Add(time.Hour * afterHours),
 		Value: DeriveSessID(r) }
 
 	// Send the HTTP header...
