@@ -44,7 +44,6 @@ type SignupError struct {
 	AlreadyLoggedIn bool }
 
 type SignupNewPage struct {
-	LoggedIn bool
 	Settings *Config
 	UX *UserExperience
 	Error *SignupError}
@@ -180,8 +179,8 @@ func (ux *UserExperience) HandleSignupNew(res *ServerRes, e *SignupError) {
 
 	tmpl := Templates[page]
 	err := tmpl.Execute(w, SignupNewPage{
+		UX: ux,
 		Error: e,
-		LoggedIn: false,
 		Settings: &Settings })
 	if err != nil {
 		HandleWebError(w, r, http.StatusInternalServerError)
