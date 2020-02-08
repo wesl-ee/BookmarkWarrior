@@ -43,6 +43,16 @@ func (b Bookmark) Add(db *sql.DB) (error) {
 	return err
 }
 
+func (b Bookmark) Edit(db *sql.DB) (error) {
+	q := `UPDATE Bookmarks
+		SET Title=?, URL=? WHERE BId=? AND Username=?`
+	insForm, err := db.Prepare(q)
+	if err != nil { return err }
+
+	_, err = insForm.Exec(b.Title, b.URL, b.BId, b.Username)
+	return err
+}
+
 func (b Bookmark) Archive(db *sql.DB) (error) {
 	q := `UPDATE Bookmarks SET Archived=true
 		WHERE BId=? AND Username=?`

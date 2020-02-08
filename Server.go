@@ -26,6 +26,13 @@ type IndexPage struct {
 	UX *UserExperience
 	Settings *Config }
 
+type UserEditPage struct {
+	Canon string
+	Title string
+	Mark Bookmark
+	UX *UserExperience
+	Settings *Config }
+
 type UserAddPage struct {
 	Canon string
 	Title string
@@ -252,6 +259,8 @@ func (ux *UserExperience) HandleBMarkAction(res *ServerRes, uname string, bID in
 		case "unread":
 			mark.MarkUnread(res.DB)
 		case "edit":
+			ux.HandleUserEdit(res, mark)
+			return
 		case "unarchive":
 			mark.Unarchive(res.DB)
 		case "archive":
@@ -264,6 +273,54 @@ func (ux *UserExperience) HandleBMarkAction(res *ServerRes, uname string, bID in
 			return
 	}
 	http.Redirect(res.Writer, res.Request, "/u/" + uname, http.StatusSeeOther)
+}
+
+func (ux *UserExperience) HandleUserEdit(res *ServerRes, mark Bookmark) {
+	uname := mark.Username
+	user, err := UserByName(res.DB, uname)
+	if err != nil {
+		HandleWebError(res.Writer, res.Request, http.StatusNotFound)
+		return }
+
+	if !ux.LoggedIn {
+		http.Redirect(res.Writer, res.Request, "/login", http.StatusSeeOther)
+		return
+	}
+
+	if ux.Username != uname {
+		HandleWebError(res.Writer, res.Request, http.StatusForbidden)
+		return }
+
+	if (res.Request.Method == "POST") {
+		if err := res.Request.ParseForm(); err != nil { panic(err) }
+		name := res.Request.FormValue("name")
+		url := res.Request.FormValue("url")
+
+		mark.Title = name
+		mark.URL = url
+		err = mark.Edit(res.DB)
+
+		if err != nil {
+			HandleWebError(res.Writer, res.Request,
+				http.StatusInternalServerError)
+			return
+		}
+		http.Redirect(res.Writer, res.Request, "/u/" + uname, http.StatusSeeOther)
+		return
+	}
+	page := "tmpl/user-edit.html"
+	tmpl := Templates[page]
+
+	err = tmpl.Execute(res.Writer, UserEditPage{
+		Canon: Settings.Web.Canon + "u/" + uname,
+		Title: user.DisplayName + " (" + uname + ") - Edit Bookmark",
+		UX: ux,
+		Mark: mark,
+		Settings: &Settings })
+	if err != nil {
+		HandleWebError(res.Writer, res.Request,
+			http.StatusInternalServerError)
+	}
 }
 
 func (ux *UserExperience) HandleLogin(res *ServerRes) {

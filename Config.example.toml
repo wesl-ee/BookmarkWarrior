@@ -69,3 +69,9 @@ Name = "tmpl/user-archive.html"
 Dependencies = [ "tmpl/head.html",
 	"tmpl/footer.html",
 	"tmpl/header.html" ]
+
+[[Templates]]
+Name = "tmpl/user-edit.html"
+Dependencies = [ "tmpl/head.html",
+	"tmpl/footer.html",
+	"tmpl/header.html" ]
