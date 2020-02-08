@@ -9,26 +9,21 @@
 <p>User since {{.User.JoinedOn}}</p>
 <a href="{{.Canon}}/archive">View Archived Bookmarks</a></aside>
 <main>
-<h2>Active Bookmarks</h2>
-{{if .User.ThisIsMe}}<nav class=user-actions><a href="{{$.Canon}}/add">Add</a></nav>{{end}}
+<h2>Archived Bookmarks</h2>
 {{if not .User.Bookmarks}}
-<p>No bookmarks...</p>
+<p>Nothing in the archive...</p>
 {{else}}<table class=bookmarks>
 <tr><th>Name</th><th>Added on</th>{{if .User.ThisIsMe}}<th>Actions</th>{{end}}{{range .User.Bookmarks}}</tr>
 <tr><td>{{if .Unread}}<strong>{{end}}<a href="{{.URL}}">{{.Title}}</a>
 {{if .Unread}}</strong>{{end}}</td>
 <td>{{.AddedOn}}</td>
 {{if $.User.ThisIsMe}}<td class="simple button-group">
-	<span class=read>{{if .Unread}}<a
-		href="{{$.Canon}}/{{.BId}}/read">Mark as Read</a>{{else}}
-		<a href="{{$.Canon}}/{{.BId}}/unread">Mark as
-		Unread</a>{{end}}</span>
 	<span class=edit><a
 		href="{{$.Canon}}/{{.BId}}/edit">Edit</a></span>
 	<span class=archive><a
-		href="{{$.Canon}}/{{.BId}}/archive">Archive</a></span>
+		href="{{$.Canon}}/{{.BId}}/unarchive">Unarchive</a></span>
 	<span class=remove><a
-		href="{{$.Canon}}/{{.BId}}/remove">Remove</a></span></td>{{end}}</tr>
+		href="{{$.Canon}}/{{.BId}}/remove">Delete</a></span></td>{{end}}</tr>
 {{end}}{{end}}
 </table>
 </main>

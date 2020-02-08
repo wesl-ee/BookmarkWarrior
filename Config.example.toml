@@ -57,3 +57,15 @@ Dependencies = [ "tmpl/head.html",
 	"tmpl/footer.html",
 	"tmpl/signup-steps.html",
 	"tmpl/header.html" ]
+
+[[Templates]]
+Name = "tmpl/user-add.html"
+Dependencies = [ "tmpl/head.html",
+	"tmpl/footer.html",
+	"tmpl/header.html" ]
+
+[[Templates]]
+Name = "tmpl/user-archive.html"
+Dependencies = [ "tmpl/head.html",
+	"tmpl/footer.html",
+	"tmpl/header.html" ]

@@ -43,6 +43,26 @@ func (b Bookmark) Add(db *sql.DB) (error) {
 	return err
 }
 
+func (b Bookmark) Archive(db *sql.DB) (error) {
+	q := `UPDATE Bookmarks SET Archived=true
+		WHERE BId=? AND Username=?`
+	upForm, err := db.Prepare(q)
+	if err != nil { return err }
+
+	_, err = upForm.Exec(b.BId, b.Username)
+	return err
+}
+
+func (b Bookmark) Unarchive(db *sql.DB) (error) {
+	q := `UPDATE Bookmarks SET Archived=false
+		WHERE BId=? AND Username=?`
+	upForm, err := db.Prepare(q)
+	if err != nil { return err }
+
+	_, err = upForm.Exec(b.BId, b.Username)
+	return err
+}
+
 func (b Bookmark) Del(db *sql.DB) (error) {
 	q := `DELETE FROM Bookmarks
 		WHERE BId=?`
@@ -100,6 +120,50 @@ func (b Bookmark) MarkUnread(db *sql.DB) (error) {
 	if err != nil { return err }
 	_, err = upForm.Exec(b.BId)
 	return err
+}
+
+func (u UserProfile) ArchivedBookmarks(db *sql.DB) (map[int]Bookmark, error) {
+	marks := make(map[int]Bookmark)
+	q := `SELECT
+		BId, Username, URL, Title, Unread, Archived, AddedOn
+		FROM Bookmarks WHERE Username=? AND Archived`
+	selForm, err := db.Prepare(q)
+	if err != nil { return marks, err }
+	var m Bookmark
+	rows, err := selForm.Query(u.Username)
+	for rows.Next() { rows.Scan(
+		&m.BId,
+		&m.Username,
+		&m.URL,
+		&m.Title,
+		&m.Unread,
+		&m.Archived,
+		&m.AddedOn)
+		marks[m.BId] = m
+	}
+	return marks,err
+}
+
+func (u UserProfile) UnarchivedBookmarks(db *sql.DB) (map[int]Bookmark, error) {
+	marks := make(map[int]Bookmark)
+	q := `SELECT
+		BId, Username, URL, Title, Unread, Archived, AddedOn
+		FROM Bookmarks WHERE Username=? AND !Archived`
+	selForm, err := db.Prepare(q)
+	if err != nil { return marks, err }
+	var m Bookmark
+	rows, err := selForm.Query(u.Username)
+	for rows.Next() { rows.Scan(
+		&m.BId,
+		&m.Username,
+		&m.URL,
+		&m.Title,
+		&m.Unread,
+		&m.Archived,
+		&m.AddedOn)
+		marks[m.BId] = m
+	}
+	return marks,err
 }
 
 func (u UserProfile) Bookmarks(db *sql.DB) (map[int]Bookmark, error) {

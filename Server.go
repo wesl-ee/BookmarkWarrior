@@ -42,6 +42,13 @@ type UserPage struct {
 	UX *UserExperience
 	Title string }
 
+type ArchivePage struct {
+	Canon string
+	Settings *Config
+	User WebUserProfile
+	UX *UserExperience
+	Title string }
+
 type SignupError struct {
 	Mismatch bool
 	Taken bool
@@ -109,7 +116,7 @@ func (ux *UserExperience) HandleUserReq(res *ServerRes, uname string) {
 		HandleWebError(w, r, http.StatusNotFound)
 		return }
 
-	marks, err := user.Bookmarks(db)
+	marks, err := user.UnarchivedBookmarks(db)
 	if err != nil {
 		// Databse error...
 		HandleWebError(w, r, http.StatusServiceUnavailable)
@@ -176,6 +183,41 @@ func (ux *UserExperience) HandleUserAdd(res *ServerRes, uname string) {
 	}
 }
 
+func (ux *UserExperience) HandleUserViewArchive(res *ServerRes, uname string) {
+	page := "tmpl/user-archive.html"
+	user, err := UserByName(res.DB, uname)
+	if err != nil {
+		// User not found...
+		HandleWebError(res.Writer, res.Request,
+			http.StatusNotFound)
+		return }
+
+	marks, err := user.ArchivedBookmarks(res.DB)
+	if err != nil {
+		// Databse error...
+		HandleWebError(res.Writer, res.Request,
+			http.StatusServiceUnavailable)
+		return
+	}
+
+	webuser:= user.AsWebEntity()
+	webuser.Bookmarks = marks
+	webuser.ThisIsMe = ux.Username == uname
+
+	tmpl := Templates[page]
+	err = tmpl.Execute(res.Writer, ArchivePage{
+		Settings: &Settings,
+		Canon: Settings.Web.Canon + "u/" + uname,
+		User: webuser,
+		UX: ux,
+		Title: user.DisplayName + " (" + uname + ") - Archived Bookmarks" })
+
+	if err != nil {
+		HandleWebError(res.Writer, res.Request,
+			http.StatusInternalServerError)
+	}
+}
+
 func (ux *UserExperience) HandleBMarkAction(res *ServerRes, uname string, bID int, action string) {
 	if ux.Username != uname {
 		HandleWebError(res.Writer, res.Request, http.StatusForbidden)
@@ -190,6 +232,7 @@ func (ux *UserExperience) HandleBMarkAction(res *ServerRes, uname string, bID in
 	if !isValid {
 		HandleWebError(res.Writer, res.Request,
 			http.StatusNotFound)
+		return
 	}
 
 	switch(action) {
@@ -198,7 +241,10 @@ func (ux *UserExperience) HandleBMarkAction(res *ServerRes, uname string, bID in
 		case "unread":
 			mark.MarkUnread(res.DB)
 		case "edit":
+		case "unarchive":
+			mark.Unarchive(res.DB)
 		case "archive":
+			mark.Archive(res.DB)
 		case "remove":
 			mark.Del(res.DB)
 		default:
@@ -488,6 +534,7 @@ func HandleReq(w http.ResponseWriter, r *http.Request) {
 
 			switch(action) {
 			case "add": ux.HandleUserAdd(res, uname)
+			case "archive": ux.HandleUserViewArchive(res, uname)
 			}
 		case 1:
 			uname := args[0]
