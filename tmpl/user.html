@@ -1,14 +1,14 @@
 <!DOCTYPE HTML>
 <html>
-<head>{{template "Head" .}}</head>
+<head>{{template "Head" .}}
+<title>{{.Title}}</title></head>
 <body>
-<header><title>{{.Title}}</title>
-{{template "Header" .}}</header>
+<header>{{template "Header" .}}</header>
 <aside><h1 class=displayname>{{.User.DisplayName}}</h1>
 <span class="username subtext">{{.User.Username}}</span>
 <p>User since {{.User.JoinedOn}}</p></aside>
 <main>
-{{if .User.ThisIsMe}}<a href>Add</a>{{end}}
+{{if .User.ThisIsMe}}<a href="{{$.Canon}}/add">Add</a>{{end}}
 {{if not .User.Bookmarks}}
 <p>No bookmarks...</p>
 {{else}}<table class=bookmarks>

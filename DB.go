@@ -33,6 +33,15 @@ func UserByName(db *sql.DB, uname string) (u UserProfile, err error) {
 	return
 }
 
+func (b Bookmark) Add(db *sql.DB) (error) {
+	q := `INSERT INTO Bookmarks
+		(Username, Title, URL) VALUES (?, ?, ?)`
+	insForm, err := db.Prepare(q)
+	if err != nil { return err }
+
+	_, err = insForm.Exec(b.Username, b.Title, b.URL)
+	return err
+}
 
 func (ws WebSession) Associated(db *sql.DB) (s Session, err error) {
 	selForm, err := db.Prepare(`SELECT

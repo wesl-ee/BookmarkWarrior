@@ -26,6 +26,11 @@ type IndexPage struct {
 	UX *UserExperience
 	Settings *Config }
 
+type UserAddPage struct {
+	Title string
+	UX *UserExperience
+	Settings *Config }
+
 type LoginPage struct {
 	Settings *Config
 	UX *UserExperience }
@@ -133,6 +138,42 @@ func (ux *UserExperience) HandleLogout(res *ServerRes) {
 	ws.Disassociate(res.DB)
 
 	http.Redirect(res.Writer, res.Request, "/", http.StatusSeeOther)
+}
+
+func (ux *UserExperience) HandleUserAdd(res *ServerRes, uname string) {
+	user, err := UserByName(res.DB, uname)
+	if err != nil {
+		HandleWebError(res.Writer, res.Request, http.StatusNotFound)
+		return }
+
+	if (res.Request.Method == "POST") {
+		if err := res.Request.ParseForm(); err != nil { panic(err) }
+		name := res.Request.FormValue("name")
+		url := res.Request.FormValue("url")
+		b := Bookmark{
+			Username: uname,
+			Title: name,
+			URL: url }
+		err = b.Add(res.DB)
+		if err != nil {
+			HandleWebError(res.Writer, res.Request,
+				http.StatusInternalServerError)
+			return
+		}
+		http.Redirect(res.Writer, res.Request, "/u/" + uname, http.StatusSeeOther)
+		return
+	}
+	page := "tmpl/user-add.html"
+	tmpl := Templates[page]
+
+	err = tmpl.Execute(res.Writer, UserAddPage{
+		Title: user.DisplayName + " (" + uname + ") - Add Bookmark",
+		UX: ux,
+		Settings: &Settings })
+	if err != nil {
+		HandleWebError(res.Writer, res.Request,
+			http.StatusInternalServerError)
+	}
 }
 
 func (ux *UserExperience) HandleBMarkAction(res *ServerRes, uname string, bID int, action string) {
@@ -410,7 +451,7 @@ func HandleReq(w http.ResponseWriter, r *http.Request) {
 		case 1:
 			step := args[0]
 
-			switch(step) {
+			switch (step) {
 			case "new":
 				ux.HandleSignupNew(res, nil)
 			case "create":
@@ -440,6 +481,13 @@ func HandleReq(w http.ResponseWriter, r *http.Request) {
 			}
 
 			ux.HandleBMarkAction(res, uname, bID, action)
+		case 2:
+			uname := args[0]
+			action := args[1]
+
+			switch(action) {
+			case "add": ux.HandleUserAdd(res, uname)
+			}
 		case 1:
 			uname := args[0]
 

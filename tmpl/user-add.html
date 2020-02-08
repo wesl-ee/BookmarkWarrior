@@ -1,0 +1,21 @@
+<!DOCTYPE HTML>
+<html>
+<head>{{template "Head" .}}
+<title>{{.Title}}</title></head>
+<body>
+<header>{{template "Header" .}}</header>
+<aside></aside>
+<main>
+<form method=post>
+	<div><label for=name>Name: <abbr title=Required
+		aria-label=Required>*</abbr></label>
+	<input id=name type=text name=name></div>
+	<div><label for=url>URL: <abbr title=Required
+		aria-label=Required>*</abbr></label>
+	<input id=url type=text name=url></div>
+	<input type=submit value=Add>
+</form>
+</main>
+<footer>{{template "Footer" .}}</footer>
+</body>
+</html>
