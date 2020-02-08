@@ -154,6 +154,15 @@ func (ux *UserExperience) HandleUserAdd(res *ServerRes, uname string) {
 		HandleWebError(res.Writer, res.Request, http.StatusNotFound)
 		return }
 
+	if !ux.LoggedIn {
+		http.Redirect(res.Writer, res.Request, "/login", http.StatusSeeOther)
+		return
+	}
+
+	if ux.Username != uname {
+		HandleWebError(res.Writer, res.Request, http.StatusForbidden)
+		return }
+
 	if (res.Request.Method == "POST") {
 		if err := res.Request.ParseForm(); err != nil { panic(err) }
 		name := res.Request.FormValue("name")
