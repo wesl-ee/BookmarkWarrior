@@ -27,7 +27,6 @@ body > header { padding: 10px 20px }
 .button-group > * { padding: 0 8px }
 .remarkable.button-group > * { border: 1px solid;
 	background-color: White }
-.simple .button-group { }
 
 input[readonly] {
 	background-color: inherit;
@@ -43,6 +42,32 @@ body > header { display: flex;
 table { width: 100% }
 .displayname { margin: 10px 0 }
 th { text-align: left }
+.tabbed-window .tabs {
+	display: inline-block;
+	border-style: solid;
+	border-width: 1px 1px 0 1px;
+	border-radius: 10px 10px 0 0;
+	list-style: none;
+	padding: 0 5px;
+	margin: 0;
+}
+.tabs li {
+	padding: 0 5px;
+	border: 1px solid;
+	display: inline;
+}
+.tabs li:first-child, .tabs li:last-child {
+	border: 0;
+}
+.tabbed-window .tab-content {
+	border: 1px solid;
+}
+
+.tab-content { padding: 5px }
+
+.tabs, .tab-content {
+	background: White;
+}
 
 .bookmarks tr > :last-child { float: right }
 

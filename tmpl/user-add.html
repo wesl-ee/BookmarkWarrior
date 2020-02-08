@@ -5,7 +5,13 @@
 <body>
 <header>{{template "Header" .}}</header>
 <aside></aside>
-<main>
+<main class=tabbed-window>
+<ul class=tabs>
+	<li><a href="{{.Canon}}">Bookmarks</a></li><!--
+	--><li><a href="{{.Canon}}/archive">Archive</a></li><!--
+	--><li><strong><a href="{{.Canon}}/add">Add</a></strong>
+</ul>
+<div class=tab-content>
 <form method=post>
 	<div><label for=name>Name: <abbr title=Required
 		aria-label=Required>*</abbr></label>
@@ -14,7 +20,7 @@
 		aria-label=Required>*</abbr></label>
 	<input id=url type=text name=url></div>
 	<input type=submit value=Add>
-</form>
+</form></div>
 </main>
 <footer>{{template "Footer" .}}</footer>
 </body>

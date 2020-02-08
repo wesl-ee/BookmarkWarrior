@@ -27,6 +27,7 @@ type IndexPage struct {
 	Settings *Config }
 
 type UserAddPage struct {
+	Canon string
 	Title string
 	UX *UserExperience
 	Settings *Config }
@@ -174,6 +175,7 @@ func (ux *UserExperience) HandleUserAdd(res *ServerRes, uname string) {
 	tmpl := Templates[page]
 
 	err = tmpl.Execute(res.Writer, UserAddPage{
+		Canon: Settings.Web.Canon + "u/" + uname,
 		Title: user.DisplayName + " (" + uname + ") - Add Bookmark",
 		UX: ux,
 		Settings: &Settings })

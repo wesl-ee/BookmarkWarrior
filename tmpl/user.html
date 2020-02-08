@@ -8,12 +8,15 @@
 <span class="username subtext">{{.User.Username}}</span>
 <p>User since {{.User.JoinedOn}}</p>
 <a href="{{.Canon}}/archive">View Archived Bookmarks</a></aside>
-<main>
-<h2>Active Bookmarks</h2>
-{{if .User.ThisIsMe}}<nav class=user-actions><a href="{{$.Canon}}/add">Add</a></nav>{{end}}
+<main class=tabbed-window>
+<ul class=tabs>
+	<li><strong><a href="{{.Canon}}">Bookmarks</a></strong></li><!--
+	--><li><a href="{{.Canon}}/archive">Archive</a></li><!--
+	-->{{if .User.ThisIsMe}}<li><a href="{{.Canon}}/add">Add</a></li>{{end}}
+</ul>
 {{if not .User.Bookmarks}}
-<p>No bookmarks...</p>
-{{else}}<table class=bookmarks>
+<div class=tab-content><p>No bookmarks...</p></div>
+{{else}}<table class="tab-content bookmarks">
 <tr><th>Name</th><th>Added on</th>{{if .User.ThisIsMe}}<th>Actions</th>{{end}}{{range .User.Bookmarks}}</tr>
 <tr><td>{{if .Unread}}<strong>{{end}}<a href="{{.URL}}">{{.Title}}</a>
 {{if .Unread}}</strong>{{end}}</td>
