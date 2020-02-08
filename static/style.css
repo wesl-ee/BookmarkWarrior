@@ -53,11 +53,12 @@ th { text-align: left }
 }
 .tabs li {
 	padding: 0 5px;
-	border: 1px solid;
+	border-style: solid;
+	border-width: 0 1px 0 0;
 	display: inline;
 }
-.tabs li:first-child, .tabs li:last-child {
-	border: 0;
+.tabs li:last-child {
+	border-width: 0;
 }
 .tabbed-window .tab-content {
 	border: 1px solid;
