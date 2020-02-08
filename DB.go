@@ -43,6 +43,16 @@ func (b Bookmark) Add(db *sql.DB) (error) {
 	return err
 }
 
+func (b Bookmark) Del(db *sql.DB) (error) {
+	q := `DELETE FROM Bookmarks
+		WHERE BId=?`
+	delForm, err := db.Prepare(q)
+	if err != nil { return err }
+
+	_, err = delForm.Exec(b.BId)
+	return err
+}
+
 func (ws WebSession) Associated(db *sql.DB) (s Session, err error) {
 	selForm, err := db.Prepare(`SELECT
 		SessID, Username, Expires

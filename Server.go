@@ -200,6 +200,7 @@ func (ux *UserExperience) HandleBMarkAction(res *ServerRes, uname string, bID in
 		case "edit":
 		case "archive":
 		case "remove":
+			mark.Del(res.DB)
 		default:
 			HandleWebError(res.Writer, res.Request,
 				http.StatusMethodNotAllowed)
