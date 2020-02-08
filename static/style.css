@@ -70,6 +70,10 @@ th { text-align: left }
 	background: White;
 }
 
+a:active { outline: 0 }
+
+.tabs a, .remarkable.button-group a { text-decoration: none }
+
 .bookmarks tr > :last-child { float: right }
 
 /* Mobile... */
