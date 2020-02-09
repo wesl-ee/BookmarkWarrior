@@ -5,11 +5,13 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+var GlobalDB *sql.DB
+
 // Uplink to the Scrin mothership
-func DBConnect(c *Config) (db *sql.DB, err error) {
-	db, _ = sql.Open("mysql", c.Database.ConnectionString)
-	err = db.Ping()
-	return
+func DBConnect(c *Config) (*sql.DB, error) {
+	if GlobalDB != nil { return GlobalDB, nil }
+	GlobalDB, _ = sql.Open("mysql", c.Database.ConnectionString)
+	return GlobalDB, GlobalDB.Ping()
 }
 
 func UserByName(db *sql.DB, uname string) (u UserProfile, err error) {

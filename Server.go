@@ -37,6 +37,7 @@ type UserEditPage struct {
 type UserAddPage struct {
 	Canon string
 	Title string
+	User WebUserProfile
 	UX *UserExperience
 	Settings *Config }
 
@@ -123,12 +124,14 @@ func (ux *UserExperience) HandleUserReq(res *ServerRes, uname string) {
 	if err != nil {
 		// User not found...
 		HandleWebError(w, r, http.StatusNotFound)
+		log.Println(err)
 		return }
 
 	marks, err := user.UnarchivedBookmarks(db)
 	if err != nil {
 		// Databse error...
 		HandleWebError(w, r, http.StatusServiceUnavailable)
+		log.Println(err)
 		return
 	}
 
@@ -146,6 +149,7 @@ func (ux *UserExperience) HandleUserReq(res *ServerRes, uname string) {
 
 	if err != nil {
 		HandleWebError(w, r, http.StatusInternalServerError)
+		log.Println(err)
 	}
 }
 
@@ -160,15 +164,18 @@ func (ux *UserExperience) HandleUserAdd(res *ServerRes, uname string) {
 	user, err := UserByName(res.DB, uname)
 	if err != nil {
 		HandleWebError(res.Writer, res.Request, http.StatusNotFound)
+		log.Println(err)
 		return }
 
 	if !ux.LoggedIn {
 		http.Redirect(res.Writer, res.Request, "/login", http.StatusSeeOther)
+		log.Println(err)
 		return
 	}
 
 	if ux.Username != uname {
 		HandleWebError(res.Writer, res.Request, http.StatusForbidden)
+		log.Println(err)
 		return }
 
 	if (res.Request.Method == "POST") {
@@ -183,6 +190,7 @@ func (ux *UserExperience) HandleUserAdd(res *ServerRes, uname string) {
 		if err != nil {
 			HandleWebError(res.Writer, res.Request,
 				http.StatusInternalServerError)
+			log.Println(err)
 			return
 		}
 		http.Redirect(res.Writer, res.Request, "/u/" + uname, http.StatusSeeOther)
@@ -190,15 +198,19 @@ func (ux *UserExperience) HandleUserAdd(res *ServerRes, uname string) {
 	}
 	page := "tmpl/user-add.html"
 	tmpl := Templates[page]
+	webuser:= user.AsWebEntity()
+	webuser.ThisIsMe = ux.Username == uname
 
 	err = tmpl.Execute(res.Writer, UserAddPage{
 		Canon: Settings.Web.Canon + "u/" + uname,
+		User: webuser,
 		Title: user.DisplayName + " (" + uname + ") - Add Bookmark",
 		UX: ux,
 		Settings: &Settings })
 	if err != nil {
 		HandleWebError(res.Writer, res.Request,
 			http.StatusInternalServerError)
+		log.Println(err)
 	}
 }
 
@@ -216,6 +228,7 @@ func (ux *UserExperience) HandleUserViewArchive(res *ServerRes, uname string) {
 		// Databse error...
 		HandleWebError(res.Writer, res.Request,
 			http.StatusServiceUnavailable)
+		log.Println(err)
 		return
 	}
 
@@ -234,6 +247,7 @@ func (ux *UserExperience) HandleUserViewArchive(res *ServerRes, uname string) {
 	if err != nil {
 		HandleWebError(res.Writer, res.Request,
 			http.StatusInternalServerError)
+		log.Println(err)
 	}
 }
 
