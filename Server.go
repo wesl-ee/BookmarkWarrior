@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 	"html/template"
 	"strconv"
 	"net/url"
@@ -374,8 +375,22 @@ func (ux *UserExperience) HandleLogin(res *ServerRes) {
 func HandleStatic(res *ServerRes) {
 	w := res.Writer
 	r := res.Request
-	http.ServeFile(w, r, "static/" + strings.TrimPrefix(
-		r.URL.Path, "/static/"))
+	filename := "static/" + strings.TrimPrefix(
+		r.URL.Path, "/static/")
+	stat, err := os.Stat(filename)
+	if err != nil {
+		HandleWebError(w, r, http.StatusNotFound)
+		return
+	}
+
+	file, err := os.Open(filename)
+	if err != nil {
+		HandleWebError(w, r, http.StatusNotFound)
+		return
+	}
+
+	modifiedTime := stat.ModTime()
+	http.ServeContent(w, r, filename, modifiedTime, file)
 }
 
 // 1st step in acc creation...
