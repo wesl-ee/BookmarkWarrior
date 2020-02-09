@@ -28,6 +28,7 @@ type IndexPage struct {
 
 type UserEditPage struct {
 	Canon string
+	User WebUserProfile
 	Title string
 	Mark Bookmark
 	UX *UserExperience
@@ -310,9 +311,11 @@ func (ux *UserExperience) HandleUserEdit(res *ServerRes, mark Bookmark) {
 	}
 	page := "tmpl/user-edit.html"
 	tmpl := Templates[page]
+	webuser:= user.AsWebEntity()
 
 	err = tmpl.Execute(res.Writer, UserEditPage{
 		Canon: Settings.Web.Canon + "u/" + uname,
+		User: webuser,
 		Title: user.DisplayName + " (" + uname + ") - Edit Bookmark",
 		UX: ux,
 		Mark: mark,

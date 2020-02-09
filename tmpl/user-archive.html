@@ -4,10 +4,7 @@
 <title>{{.Title}}</title></head>
 <body>
 <header>{{template "Header" .}}</header>
-<aside><a href="{{.Canon}}"><h1 class=displayname>{{.User.DisplayName}}</h1></a>
-<span class="username subtext">{{.User.Username}}</span>
-<p>User since {{.User.JoinedOn}}</p>
-<a href="{{.Canon}}/archive">View Archived Bookmarks</a></aside>
+<aside>{{template "UserAside" .User}}</aside>
 <main class=tabbed-window>
 <ul class=tabs>
 	<li><a href="{{.Canon}}">Bookmarks</a></li><!--

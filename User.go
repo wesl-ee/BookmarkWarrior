@@ -11,6 +11,7 @@ type WebUserProfile struct {
 	DisplayName string
 	JoinedOn string
 	Bookmarks map[int]Bookmark
+	Homepage string
 	ThisIsMe bool
 }
 
@@ -26,6 +27,7 @@ func (u *UserProfile) AsWebEntity() (wu WebUserProfile) {
 	wu.Username = u.Username
 	wu.DisplayName = u.DisplayName
 	wu.JoinedOn = u.JoinedOn
+	wu.Homepage = Settings.Web.Canon + "u/" + u.Username
 	return
 }
 

@@ -29,7 +29,8 @@ Dependencies = [ "tmpl/head.html",
 Name = "tmpl/user.html"
 Dependencies = [ "tmpl/head.html",
 	"tmpl/footer.html",
-	"tmpl/header.html" ]
+	"tmpl/header.html",
+	"tmpl/user-aside.html" ]
 
 [[Templates]]
 Name = "tmpl/login.html"
@@ -62,16 +63,19 @@ Dependencies = [ "tmpl/head.html",
 Name = "tmpl/user-add.html"
 Dependencies = [ "tmpl/head.html",
 	"tmpl/footer.html",
-	"tmpl/header.html" ]
+	"tmpl/header.html",
+	"tmpl/user-aside.html" ]
 
 [[Templates]]
 Name = "tmpl/user-archive.html"
 Dependencies = [ "tmpl/head.html",
 	"tmpl/footer.html",
-	"tmpl/header.html" ]
+	"tmpl/header.html",
+	"tmpl/user-aside.html" ]
 
 [[Templates]]
 Name = "tmpl/user-edit.html"
 Dependencies = [ "tmpl/head.html",
 	"tmpl/footer.html",
-	"tmpl/header.html" ]
+	"tmpl/header.html",
+	"tmpl/user-aside.html" ]
