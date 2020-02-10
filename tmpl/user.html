@@ -15,7 +15,7 @@
 <div class=tab-content><p>No bookmarks...</p></div>
 {{else}}<table class="tab-content bookmarks">
 <tr><th>Name</th><th>Added on</th>{{if .User.ThisIsMe}}<th>Actions</th>{{end}}{{range .User.Bookmarks}}</tr>
-<tr><td>{{if .Unread}}<strong>{{end}}<a href="{{.URL}}">{{.Title}}</a>
+<tr><td>{{if .Unread}}<strong>{{end}}<a rel=nofollow href="{{.URL}}">{{.Title}}</a>
 {{if .Unread}}</strong>{{end}}</td>
 <td>{{.AddedOn}}</td>
 {{if $.User.ThisIsMe}}<td class="simple button-group">
