@@ -23,7 +23,8 @@ Name = "tmpl/index.html"
 Dependencies = [ "tmpl/head.html",
 	"tmpl/footer.html",
 	"tmpl/header.html",
-	"tmpl/signup-steps.html" ]
+	"tmpl/signup-steps.html",
+	"tmpl/my/welcome.html" ]
 
 [[Templates]]
 Name = "tmpl/user.html"
