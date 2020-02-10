@@ -1,5 +1,9 @@
 package main
 
+import (
+	"net/url"
+)
+
 type BookmarkWeb struct {
 }
 
@@ -19,3 +23,16 @@ type Bookmark struct {
 	wu.JoinedOn = u.JoinedOn
 	return
 } */
+
+func IsURL(str string) bool {
+	u, err := url.Parse(str)
+
+	if u.Host == "" {
+		return false }
+
+	if err != nil ||
+		u.Host == "" ||
+		!(u.Scheme == "http" || u.Scheme == "https") {
+		return false }
+	return true
+}

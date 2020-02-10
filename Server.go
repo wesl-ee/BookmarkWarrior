@@ -183,6 +183,13 @@ func (ux *UserExperience) HandleUserAdd(res *ServerRes, uname string) {
 		if err := res.Request.ParseForm(); err != nil { panic(err) }
 		name := res.Request.FormValue("name")
 		url := res.Request.FormValue("url")
+
+		if !IsURL(url) {
+			HandleWebError(res.Writer, res.Request,
+				http.StatusBadRequest)
+			return
+		}
+
 		b := Bookmark{
 			Username: uname,
 			Title: name,
