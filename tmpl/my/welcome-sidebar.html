@@ -1,0 +1,9 @@
+{{define "MyWelcomeSidebar"}}
+<form method=post action="{{.Web.Canon}}login">
+	<div><label for=username>Username: </label>
+	<input id=username type=text name=username></div>
+	<div><label for=password>Password: </label>
+	<input id=password type=password name=password></div>
+	<button type=submit>Login</button>
+</form>
+{{end}}
