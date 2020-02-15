@@ -18,7 +18,7 @@ body > header { grid-area: header }
 body > main,
 body > aside,
 body > footer,
-body > header { padding: 10px 20px }
+body > header { padding: 10px }
 .bigish { font-size: 1.5rem }
 #big-title { font-size: 2.5rem }
 
@@ -73,6 +73,32 @@ th { text-align: left }
 a:active { outline: 0 }
 a, a:visited { color: blue }
 a:hover { color: red }
+
+form label, input { display: block }
+input {
+	border: 1px solid;
+	font-size: 110%;
+	padding: 2px;
+	max-width: 100%;
+	margin: 0 0 10px 25px;
+	width: 200px;
+	background-color: white }
+button[type=submit] {
+	background-color: white;
+	border: 1px solid;
+	font-size: 125% }
+
+.signup-cta { font-size: 150%;
+	display: inline-block;
+	background-color: green;
+	color: white !important;
+	font-weight: bold;
+	text-decoration: none;
+	padding: 2px 5px;
+	margin: 5px 0;
+	border-radius: 10px }
+
+.signup-steps { text-align: right }
 
 .tabs a, .remarkable.button-group a { text-decoration: none }
 
