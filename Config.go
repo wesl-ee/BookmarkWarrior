@@ -24,6 +24,8 @@ type PayPalSettings struct {
 	Client string
 	Secret string
 	OneTimeCost float64
+	DomesticCurrency string
+	DomesticCurrencySigil string
 }
 
 type WebSettings struct {

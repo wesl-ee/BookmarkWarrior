@@ -13,6 +13,7 @@ Client = "MYPAYPALCLIENTID"
 Secret = "MYPAYPALSECRET"
 OneTimeCost = 10.00
 DomesticCurrency = "USD"
+DomesticCurrencySigil = "$"
 
 [Database]
 ConnectionString = "bookmarkboy:password@tcp(localhost)/bookmarkwarrior"
