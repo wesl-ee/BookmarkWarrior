@@ -88,6 +88,10 @@ button[type=submit] {
 	border: 1px solid;
 	font-size: 125% }
 
+#paypal-button-container {
+	margin: 20px 0;
+	width: 350px }
+
 .signup-cta { font-size: 150%;
 	display: inline-block;
 	background-color: green;
@@ -99,6 +103,8 @@ button[type=submit] {
 	border-radius: 10px }
 
 .signup-steps { text-align: right }
+.secure-checkout { text-align: center }
+#paypal-button-container { margin: auto }
 
 .tabs a, .remarkable.button-group a { text-decoration: none }
 

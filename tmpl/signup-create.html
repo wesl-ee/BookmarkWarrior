@@ -4,7 +4,14 @@
 <script src="https://www.paypal.com/sdk/js?client-id=AQng68TQsRgFicTyzGIes8BCvz-DjaQVL_2wIM1Xw4CN0o1T9py0DgfmMZWKmKiKUrUGUBM-RJkRyT0W"></script>
 {{template "Head" .}}</head>
 <body>
-<aside></aside>
+<aside>
+<h2>Order Details</h2>
+<table><tr><th>Price</th>
+<td>{{.Settings.PayPal.DomesticCurrencySigil}}{{.Settings.PayPal.OneTimeCost}}</td>
+</tr><tr><th>Estimated Tax</th>
+<td>{{.Settings.PayPal.DomesticCurrencySigil}}0</td></tr>
+</table>
+</aside>
 <header>{{template "Header" .}}</header>
 <main>
 <header class=signup-steps>{{template "SignupSteps" 2}}</header>
@@ -19,7 +26,11 @@
 		aria-label=Required>*</abbr></label>
 	<input id=password type=password name=password readonly
 		value="{{.Password}}"></div></form>
+	<hr>
+	<div class=secure-checkout>
+		<h3>Secure PayPal Checkout</h3>
 		<div id=paypal-button-container></div>
+	</div>
 </main>
 <footer>{{template "Footer" .}}</footer>
 <script>
@@ -39,7 +50,7 @@ paypal.Buttons({
 			confirm.submit();
 		});
 	}
-}).render('#paypal-button-container')
+}).render('#paypal-button-container');
 function addParam(form, name, value) {
 	var e = document.createElement("input");
 	e.name = name;
