@@ -71,6 +71,8 @@ th { text-align: left }
 }
 
 a:active { outline: 0 }
+a, a:visited { color: blue }
+a:hover { color: red }
 
 .tabs a, .remarkable.button-group a { text-decoration: none }
 
