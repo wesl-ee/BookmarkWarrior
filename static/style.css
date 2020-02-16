@@ -19,8 +19,6 @@ body > main,
 body > aside,
 body > footer,
 body > header { padding: 10px }
-.bigish { font-size: 1.5rem }
-#big-title { font-size: 2.5rem }
 
 .button-group { display: flex;
 	flex-wrap: wrap }
@@ -101,6 +99,8 @@ button[type=submit] {
 	padding: 2px 5px;
 	margin: 5px 0;
 	border-radius: 10px }
+
+a img { border: 1px solid }
 
 .signup-steps { text-align: right }
 .secure-checkout { text-align: center }
