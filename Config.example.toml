@@ -12,7 +12,7 @@ OrderAPI = "https://api.sandbox.paypal.com/v2/checkout/orders/"
 Client = "MYPAYPALCLIENTID"
 Secret = "MYPAYPALSECRET"
 OneTimeCost = 10.00
-DomesticCurrency = "USD"
+DomesticCurrency = "USD" # PayPal Currency Code
 DomesticCurrencySigil = "$"
 
 [Database]
