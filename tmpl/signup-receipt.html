@@ -7,7 +7,13 @@
 <header>{{template "Header" .}}</header>
 <main>
 <header class=signup-steps>{{template "SignupSteps" 4}}</header>
-Thank you!
+<h1>Order Receipt</h1>
+<p>Congratulations, you're all set up! We've received your payment of
+{{.Settings.PayPal.DomesticCurrencySigil}}{{.Settings.PayPal.OneTimeCost}};
+you may want to print this page for your records.</p>
+<p>Now that you have an account, you're encouraged to explore all of the
+features we have on BookmarkWarrior; first, head over to your user page
+to learn more.</p>
 </main>
 <footer>{{template "Footer" .}}</footer>
 </body>

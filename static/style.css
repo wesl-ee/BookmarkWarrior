@@ -88,14 +88,13 @@ button[type=submit] {
 	font-size: 125% }
 
 #paypal-button-container {
-	margin: 20px 0;
+	margin: auto;
 	width: 350px }
 
 a img { border: 1px solid }
 
-.signup-steps { text-align: right }
-.secure-checkout { text-align: center }
-#paypal-button-container { margin: auto }
+.signup-steps { text-align: right; float: right }
+.secure-checkout { text-align: right; float: left }
 
 .tabs a, .remarkable.button-group a { text-decoration: none }
 

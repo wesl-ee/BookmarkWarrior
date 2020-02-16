@@ -15,6 +15,7 @@
 <header>{{template "Header" .}}</header>
 <main>
 <header class=signup-steps>{{template "SignupSteps" 2}}</header>
+<h1>Confirm / Checkout</h1>
 <form method=post action="{{.Settings.Web.Canon}}signup/pay" id=confirm>
 	<div><label for=username>Username: <abbr title=Required
 		aria-label=Required>*</abbr></label>
@@ -26,7 +27,6 @@
 		aria-label=Required>*</abbr></label>
 	<input id=password type=password name=password readonly
 		value="{{.Password}}"></div></form>
-	<hr>
 	<div class=secure-checkout>
 		<h3>Secure PayPal Checkout</h3>
 		<div id=paypal-button-container></div>
