@@ -1,5 +1,8 @@
 {{define "MyWelcomeSidebar"}}
-<a class="signup-cta" href="{{.Web.Canon}}signup">Sign up!</a>
+<div class="remarkable button-group">
+	<a href="{{.Web.Canon}}login">Login</a>
+	<a href="{{.Web.Canon}}signup">Signup</a>
+</div>
 <form method=post action="{{.Web.Canon}}login">
 	<label for=username>Username: </label>
 	<input id=username type=text name=username>
