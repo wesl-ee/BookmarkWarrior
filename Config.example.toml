@@ -46,7 +46,8 @@ Name = "tmpl/signup-new.html"
 Dependencies = [ "tmpl/head.html",
 	"tmpl/footer.html",
 	"tmpl/header.html",
-	"tmpl/signup-steps.html" ]
+	"tmpl/signup-steps.html",
+	"tmpl/my/encourage-sidebar.html" ]
 
 [[Templates]]
 Name = "tmpl/signup-create.html"
