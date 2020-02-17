@@ -1,0 +1,8 @@
+{{define "UserNoBookmarks"}}{{if .ThisIsMe}}
+<p>You have no bookmarks at the moment! Start by
+<a href="{{.Homepage}}/add">adding bookmarks</a> to start keeping track of
+interesting articles, research papers, or other cool webpages!</p>{{else}}
+<p>There are no active bookmarks in this reading list at the moment; maybe
+you can check out <a href="{{.Homepage}}/archive">their archive</a> to see
+some older bookmarks.</p>{{end}}
+{{end}}

@@ -1,0 +1,6 @@
+{{define "UserNoArchived"}}{{if .ThisIsMe}}
+<p>Your archive is empty! You can archive bookmarks you've added by
+selecting to "Archive" a certain bookmark in your <a href="{{.Homepage}}">bookmark list</a>.</p>{{else}}
+<p>This user has not archive anything! Maybe they have some interesting links
+on their <a href="{{.Homepage}}">homepage listing</a>.</p>{{end}}
+{{end}}

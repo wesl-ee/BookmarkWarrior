@@ -509,6 +509,9 @@ func (ux *UserExperience) HandleSignupPay(res *ServerRes) {
 		if err != nil { panic(err) }
 		fmt.Println(u)
 
+		// Log us in immediately after acc. creation
+		ThisSession(r).Associate(db, u.Username)
+
 		// ...P-R-G and to show receipt (minimize refresh errors)
 		http.Redirect(w, r, "/signup/receipt", http.StatusFound);
 		return

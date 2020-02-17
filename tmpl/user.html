@@ -12,7 +12,7 @@
 	-->{{if .User.ThisIsMe}}<li><a href="{{.Canon}}/add">Add</a></li>{{end}}
 </ul>
 {{if not .User.Bookmarks}}
-<div class=tab-content><p>No bookmarks...</p></div>
+<div class=tab-content>{{template "UserNoBookmarks" .User}}</div>
 {{else}}<table class="tab-content bookmarks">
 <tr><th>Name</th><th>Added on</th>{{if .User.ThisIsMe}}<th>Actions</th>{{end}}{{range .User.Bookmarks}}</tr>
 <tr><td>{{if .Unread}}<strong>{{end}}<a rel=nofollow href="{{.URL}}">{{.Title}}</a>

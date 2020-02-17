@@ -33,7 +33,8 @@ Name = "tmpl/user.html"
 Dependencies = [ "tmpl/head.html",
 	"tmpl/footer.html",
 	"tmpl/header.html",
-	"tmpl/user-aside.html" ]
+	"tmpl/user-aside.html",
+	"tmpl/my/no-bookmarks.html" ]
 
 [[Templates]]
 Name = "tmpl/login.html"
@@ -75,7 +76,8 @@ Name = "tmpl/user-archive.html"
 Dependencies = [ "tmpl/head.html",
 	"tmpl/footer.html",
 	"tmpl/header.html",
-	"tmpl/user-aside.html" ]
+	"tmpl/user-aside.html",
+	"tmpl/my/no-archived.html" ]
 
 [[Templates]]
 Name = "tmpl/user-edit.html"
