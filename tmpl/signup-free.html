@@ -1,14 +1,13 @@
 <!DOCTYPE HTML>
 <html>
 <head><title>Sign-up for BookmarkWarrior!</title>
-<script src="https://www.paypal.com/sdk/js?client-id={{.Settings.PayPal.Client}}"></script>
 {{template "Head" .}}</head>
 <body>
 <header>{{template "Header" .}}</header>
 <aside>
 <h2>Order Details</h2>
 <table class=bill><tr><th>Price</th>
-<td>{{.Settings.PayPal.DomesticCurrencySigil}}{{.Cost}}</td>
+<td>FREE!</td>
 </tr><tr><th>Estimated Tax</th>
 <td>{{.Settings.PayPal.DomesticCurrencySigil}}0</td></tr>
 </table>
@@ -27,40 +26,10 @@
 		aria-label=Required>*</abbr></label>
 	<input id=password type=password name=password readonly
 		value="{{.Password}}">
+	<button type=submit>Create account</button>
 	<input type=hidden id=promo name=promo
 		value="{{.Promo}}"></div></form>
-	<div class=secure-checkout>
-		<h3>Secure PayPal Checkout</h3>
-		<div id=paypal-button-container></div>
-	</div>
 </main>
 <footer>{{template "Footer" .}}</footer>
-<script>
-var confirm = document.getElementById("confirm");
-paypal.Buttons({
-	createOrder: function(data, actions) {
-		return actions.order.create({
-			purchase_units: [{
-				amount: {
-					value: '{{.Settings.PayPal.OneTimeCost}}',
-					currency_code: '{{.Settings.PayPal.DomesticCurrency}}'
-				}
-			}]
-		});
-	},
-	onApprove: function(data, actions) {
-		return actions.order.capture().then(function(details) {
-			// Hack hack hack...
-			addParam(confirm, "orderid", details.id);
-			confirm.submit();
-		});
-	}
-}).render('#paypal-button-container');
-function addParam(form, name, value) {
-	var e = document.createElement("input");
-	e.name = name;
-	e.type = "hidden";
-	e.value = value;
-	form.appendChild(e); }</script>
 </body>
 </html>

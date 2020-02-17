@@ -76,6 +76,16 @@ type SignupCreatePage struct {
 	Username string
 	DisplayName string
 	Password string
+	Promo string
+	Cost float64
+	UX *UserExperience
+	Settings *Config }
+
+type SignupFreePage struct {
+	Username string
+	DisplayName string
+	Password string
+	Promo string
 	UX *UserExperience
 	Settings *Config }
 
@@ -421,7 +431,6 @@ func (ux *UserExperience) HandleSignupCreate(res *ServerRes) {
 	w := res.Writer
 	r := res.Request
 	db := res.DB
-	page := "tmpl/signup-create.html"
 
 	// Parse form submission
 	if (r.Method != "POST") {
@@ -434,6 +443,7 @@ func (ux *UserExperience) HandleSignupCreate(res *ServerRes) {
 	displayname := r.FormValue("displayname")
 	password := r.FormValue("password")
 	confirmpassword := r.FormValue("confirmpassword")
+	promo := r.FormValue("promo")
 
 	if displayname == "" {
 		displayname = username
@@ -464,20 +474,46 @@ func (ux *UserExperience) HandleSignupCreate(res *ServerRes) {
 		return
 	}
 
-	tmpl := Templates[page]
-	err = tmpl.Execute(w, SignupCreatePage{
-		Username: username,
-		DisplayName: displayname,
-		Password: password,
-		UX: ux,
-		Settings: &Settings })
-	if err != nil {
-		HandleWebError(w, r, http.StatusInternalServerError)
+	// Promotional discount
+	cost := Settings.PayPal.OneTimeCost
+	if promo != "" {
+		discount, _ := PromoDiscount(db, promo)
+		cost -= discount
+	}
+
+	if cost <= 0 {
+		page := "tmpl/signup-free.html"
+		tmpl := Templates[page]
+		err = tmpl.Execute(w, SignupFreePage{
+			Username: username,
+			DisplayName: displayname,
+			Password: password,
+			Promo: promo,
+			UX: ux,
+			Settings: &Settings })
+		if err != nil {
+			HandleWebError(w, r, http.StatusInternalServerError)
+		}
+	} else {
+		page := "tmpl/signup-create.html"
+		tmpl := Templates[page]
+		err = tmpl.Execute(w, SignupCreatePage{
+			Username: username,
+			DisplayName: displayname,
+			Password: password,
+			Cost: cost,
+			Promo: promo,
+			UX: ux,
+			Settings: &Settings })
+		if err != nil {
+			HandleWebError(w, r, http.StatusInternalServerError)
+		}
 	}
 }
 
 // 3rd step in acc creation...
 func (ux *UserExperience) HandleSignupPay(res *ServerRes) {
+	var err error
 	w := res.Writer
 	r := res.Request
 	db := res.DB
@@ -492,11 +528,22 @@ func (ux *UserExperience) HandleSignupPay(res *ServerRes) {
 	username := r.FormValue("username")
 	displayname := r.FormValue("displayname")
 	password := r.FormValue("password")
+	promo := r.FormValue("promo")
 	orderID := r.FormValue("orderid")
 
-	// Poll PayPal for payment verification
-	paid, err := VerifyPayment(orderID)
-	if err != nil { panic(err) }
+	// Promotional discount
+	cost := Settings.PayPal.OneTimeCost
+	if promo != "" {
+		discount, _ := PromoDiscount(db, promo)
+		cost -= discount
+	}
+
+	paid := false
+	if cost > 0 {
+		// Poll PayPal for payment verification
+		paid, err = VerifyPayment(orderID)
+		if err != nil { panic(err) }
+	} else { paid = true }
 
 	if paid {
 		// Actually create account in DB

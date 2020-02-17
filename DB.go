@@ -14,6 +14,16 @@ func DBConnect(c *Config) (*sql.DB, error) {
 	return GlobalDB, GlobalDB.Ping()
 }
 
+func PromoDiscount(db *sql.DB, promo string) (discount float64, err error) {
+	var expires string
+	selForm, err := db.Prepare(`SELECT
+		Expires, Discount
+		FROM Promos WHERE Code=?`)
+	if err != nil { return }
+	err = selForm.QueryRow(promo).Scan(&expires, &discount)
+	return
+}
+
 func UserByName(db *sql.DB, uname string) (u UserProfile, err error) {
 	selForm, err := db.Prepare(`SELECT
 		Username, DisplayName, JoinedOn, Shadow, APISecret
