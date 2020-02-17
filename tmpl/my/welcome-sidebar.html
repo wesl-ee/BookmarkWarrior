@@ -1,4 +1,5 @@
-{{define "MyWelcomeSidebar"}}
+{{define "MyWelcomeSidebar"}}{{if not .UX.LoggedIn}}{{with .Settings}}
+<h1>Homepage</h1>
 <div class="remarkable button-group">
 	<a href="{{.Web.Canon}}login">Login</a>
 	<a href="{{.Web.Canon}}signup">Signup</a>
@@ -12,4 +13,9 @@
 </form>
 <p>Or <a href="/signup">join forever</a> for only
 {{.PayPal.DomesticCurrencySigil}}{{.PayPal.OneTimeCost}}!</p>
-{{end}}
+{{end}}{{else}}
+<h1>Hey There!</h1>
+<p>Welcome back; found something novel or interesting to read today? Try
+adding it to <a href="{{.Settings.Web.Canon}}u/{{.UX.Username}}">your
+list</a>!</p>
+{{end}}{{end}}
