@@ -20,9 +20,9 @@ body > aside,
 body > footer,
 body > header { padding: 10px }
 
-.button-group { display: flex;
-	flex-wrap: wrap }
-.button-group > * { padding: 0 8px }
+main p { text-align: justify }
+.button-group { display: flex }
+.button-group > * { padding: 0 8px; margin: 10px 0 }
 .remarkable.button-group > * { border: 1px solid;
 	background-color: White }
 aside .button-group { justify-content: flex-end }
@@ -35,10 +35,10 @@ input[readonly] {
 .error { color: red }
 
 /* Layouts */
-body > header { display: flex;
-	align-items: flex-end;
-	justify-content: space-between }
-table { width: 100% }
+body > header .button-group {
+	float: right }
+table { width: 100%; border-spacing: 0 6px }
+.bill { background-color: white; border: 1px solid }
 .displayname { margin: 10px 0 }
 th { text-align: left }
 .tabbed-window .tabs {
@@ -69,10 +69,13 @@ th { text-align: left }
 	background: White;
 }
 
+.tab-content .button-group { text-align: right }
+
 a:active { outline: 0 }
 a, a:visited { color: blue }
 a:hover { color: red }
 
+.tab-content input { width: calc(100% - 50px) }
 form label, input { display: block }
 input {
 	border: 1px solid;
@@ -87,14 +90,17 @@ button[type=submit] {
 	border: 1px solid;
 	font-size: 125% }
 
+.subtext { font-style: italic; font-size: 90% }
+
 #paypal-button-container {
 	margin: auto;
 	width: 350px }
 
+img { max-width: 100%; height: auto }
 a img { border: 1px solid }
 
 .signup-steps { text-align: right; float: right }
-.secure-checkout { text-align: right; float: left }
+.secure-checkout { text-align: right; display: inline-block }
 
 .tabs a, .remarkable.button-group a { text-decoration: none }
 
@@ -103,4 +109,8 @@ a img { border: 1px solid }
 /* Mobile... */
 @media only screen and (max-width: 800px) {
 	body { display: block }
-	header { display: block } }
+	.tab-content .button-group { display: block }
+	.tab-content .button-group > * { display: block }
+	aside .button-group { display: none }
+	body > aside { border: 0 }
+	body > header { display: block } }
