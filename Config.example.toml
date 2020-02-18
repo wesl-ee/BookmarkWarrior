@@ -1,3 +1,5 @@
+MaxUsernameLength = 15
+MaxDisplaynameLength = 50
 MinimumPasswordLength = 6
 
 [Web]

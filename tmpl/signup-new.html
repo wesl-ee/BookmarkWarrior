@@ -20,13 +20,18 @@
 	<p>You will log in using your username
 	but your display name can be anything (a real name, an alias, etc. etc.)</p>
 	<label for=username>Username: <abbr title=Required
-		aria-label=Required>*</abbr></label>
-	<input id=username required type=text name=username>
-	<label for=displayname>Display Name (real name or alias):</label>
+		aria-label=Required>*</abbr> (a-z,0-9,- and ≤{{.Settings.MaxUsernameLength}}
+		characters)</label>
+	<input id=username required maxlength="{{.Settings.MaxUsernameLength}}"
+		type=text name=username>
+	<label for=displayname>Display Name (real name or alias):
+	(≤{{.Settings.MaxDisplaynameLength}} characters)</label>
 	<input id=displayname type=text name=displayname>
 	<label for=password>Password: <abbr title=Required
 		aria-label=Required>*</abbr></label>
-	<input id=password required type=password name=password>
+	<input id=password required maxlength="{{.Settings.MaxDisplaynameLength}}"
+		minlength="{{.Settings.MinimumPasswordLength}}" type=password
+		name=password>
 	<label for=confirmpassword>Confirm Password: <abbr title=Required
 		aria-label=Required>*</abbr></label>
 	<input id=confirmpassword required type=password name=confirmpassword>

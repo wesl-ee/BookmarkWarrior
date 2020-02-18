@@ -59,5 +59,9 @@ func ValidUsername(uname string) (bool) {
 			return false
 		}
 	}
-	return true
+	return len(uname) <= Settings.MaxUsernameLength
+}
+
+func ValidPassword(pass string) (bool) {
+	return len(pass) >= Settings.MinimumPasswordLength
 }

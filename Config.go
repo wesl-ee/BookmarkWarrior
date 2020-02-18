@@ -5,6 +5,8 @@ import (
 )
 
 type Config struct {
+	MaxUsernameLength int
+	MaxDisplaynameLength int
 	MinimumPasswordLength int
 	Web WebSettings
 	Database DBSettings

@@ -466,11 +466,9 @@ func (ux *UserExperience) HandleSignupCreate(res *ServerRes) {
 	confirmpassword := r.FormValue("confirmpassword")
 	promo := r.FormValue("promo")
 
-	if displayname == "" {
-		displayname = username
-	}
+	if displayname == "" { displayname = username }
 
-	if len(password) < Settings.MinimumPasswordLength {
+	if !ValidPassword(password) {
 		w.WriteHeader(http.StatusUnprocessableEntity)
 		ux.HandleSignupNew(res, &SignupError{ShortPassword: true})
 		return
@@ -558,6 +556,8 @@ func (ux *UserExperience) HandleSignupPay(res *ServerRes) {
 		discount, _ := PromoDiscount(db, promo)
 		cost -= discount
 	}
+
+	if displayname == "" { displayname = username }
 
 	paid := false
 	if cost > 0 {
