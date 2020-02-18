@@ -10,7 +10,7 @@ type WebUserProfile struct {
 	Username string
 	DisplayName string
 	JoinedOn string
-	Bookmarks map[int]Bookmark
+	Bookmarks []Bookmark
 	Homepage string
 	ThisIsMe bool
 }

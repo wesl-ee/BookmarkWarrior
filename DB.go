@@ -8,6 +8,18 @@ import (
 
 var GlobalDB *sql.DB
 
+type BOrder struct {
+	Parameter string
+	Order string
+}
+const (
+	OrderAscending = "ASC"
+	OrderDescending = "DESC"
+)
+const (
+	SortByAdded = "AddedOn"
+)
+
 // Uplink to the Scrin mothership
 func DBConnect(c *Config) (*sql.DB, error) {
 	if GlobalDB != nil { return GlobalDB, nil }
@@ -144,11 +156,12 @@ func (b Bookmark) MarkUnread(db *sql.DB) (error) {
 	return err
 }
 
-func (u UserProfile) ArchivedBookmarks(db *sql.DB) (map[int]Bookmark, error) {
-	marks := make(map[int]Bookmark)
+func (u UserProfile) ArchivedBookmarks(db *sql.DB, order BOrder) ([]Bookmark, error) {
+	var marks []Bookmark
 	q := `SELECT
 		BId, Username, URL, Title, Unread, Archived, AddedOn
-		FROM Bookmarks WHERE Username=? AND Archived`
+		FROM Bookmarks WHERE Username=? AND Archived ORDER BY ` +
+		order.Parameter + " " + order.Order
 	selForm, err := db.Prepare(q)
 	if err != nil { return marks, err }
 	var m Bookmark
@@ -161,16 +174,17 @@ func (u UserProfile) ArchivedBookmarks(db *sql.DB) (map[int]Bookmark, error) {
 		&m.Unread,
 		&m.Archived,
 		&m.AddedOn)
-		marks[m.BId] = m
+		marks = append(marks, m)
 	}
 	return marks,err
 }
 
-func (u UserProfile) UnarchivedBookmarks(db *sql.DB) (map[int]Bookmark, error) {
-	marks := make(map[int]Bookmark)
+func (u UserProfile) UnarchivedBookmarks(db *sql.DB, order BOrder) ([]Bookmark, error) {
+	var marks []Bookmark
 	q := `SELECT
 		BId, Username, URL, Title, Unread, Archived, AddedOn
-		FROM Bookmarks WHERE Username=? AND !Archived`
+		FROM Bookmarks WHERE Username=? AND !Archived ORDER BY ` +
+		order.Parameter + " " + order.Order
 	selForm, err := db.Prepare(q)
 	if err != nil { return marks, err }
 	var m Bookmark
@@ -183,7 +197,7 @@ func (u UserProfile) UnarchivedBookmarks(db *sql.DB) (map[int]Bookmark, error) {
 		&m.Unread,
 		&m.Archived,
 		&m.AddedOn)
-		marks[m.BId] = m
+		marks = append(marks, m)
 	}
 	return marks,err
 }

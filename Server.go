@@ -147,7 +147,9 @@ func (ux *UserExperience) HandleUserReq(res *ServerRes, uname string) {
 		log.Println(err)
 		return }
 
-	marks, err := user.UnarchivedBookmarks(db)
+	marks, err := user.UnarchivedBookmarks(db, BOrder{
+		Parameter: SortByAdded,
+		Order: OrderAscending})
 	if err != nil {
 		// Databse error...
 		HandleWebError(w, r, http.StatusServiceUnavailable)
@@ -250,7 +252,9 @@ func (ux *UserExperience) HandleUserViewArchive(res *ServerRes, uname string) {
 			http.StatusNotFound)
 		return }
 
-	marks, err := user.ArchivedBookmarks(res.DB)
+	marks, err := user.ArchivedBookmarks(res.DB, BOrder{
+		Parameter: SortByAdded,
+		Order: OrderAscending})
 	if err != nil {
 		// Databse error...
 		HandleWebError(res.Writer, res.Request,
