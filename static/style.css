@@ -19,6 +19,7 @@ body > main,
 body > aside,
 body > footer,
 body > header { padding: 10px }
+body > header > :first-child { float: left }
 
 main p { text-align: justify }
 .button-group { display: flex }
@@ -113,4 +114,5 @@ a img { border: 1px solid }
 	.tab-content .button-group > * { display: block }
 	aside .button-group { display: none }
 	body > aside { border: 0 }
+	body > header > :first-child { float: none }
 	body > header { display: block } }

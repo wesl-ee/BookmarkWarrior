@@ -60,6 +60,10 @@ type ArchivePage struct {
 	UX *UserExperience
 	Title string }
 
+type InfoPage struct {
+	UX *UserExperience
+	Settings *Config }
+
 type SignupError struct {
 	Mismatch bool
 	Taken bool
@@ -410,6 +414,23 @@ func HandleStatic(res *ServerRes) {
 	http.ServeContent(w, r, filename, modifiedTime, file)
 }
 
+func (ux *UserExperience) HandleInfo(res *ServerRes, which string) {
+	var page string
+	switch(which) {
+	case "about":
+		page = "tmpl/about.html"
+	case "privacy":
+		page = "tmpl/privacy.html"
+	case "mission":
+		page = "tmpl/mission.html"
+	case "technology":
+		page = "tmpl/technology.html"
+	}
+	Templates[page].Execute(res.Writer, InfoPage{
+		UX: ux,
+		Settings: &Settings })
+}
+
 // 1st step in acc creation...
 func (ux *UserExperience) HandleSignupNew(res *ServerRes, e *SignupError) {
 	w := res.Writer
@@ -591,6 +612,10 @@ func HandleReq(w http.ResponseWriter, r *http.Request) {
 		"logout": true,
 		"signup": true,
 		"static": true,
+		"privacy": true,
+		"about": true,
+		"mission": true,
+		"technology": true,
 		"u": true }
 
 	parts := strings.Split(
@@ -702,6 +727,14 @@ func HandleReq(w http.ResponseWriter, r *http.Request) {
 		}
 	case "static":
 		HandleStatic(res)
+	case "about": fallthrough
+	case "technology": fallthrough
+	case "privacy": fallthrough
+	case "mission":
+		// Static pages
+		if len(args) > 0 {
+			HandleWebError(w, r, http.StatusNotFound)
+		} else { ux.HandleInfo(res, dispatcher) }
 	default:
 		HandleWebError(w, r, http.StatusNotFound)
 	}
