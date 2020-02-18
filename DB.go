@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"errors"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -15,12 +16,11 @@ func DBConnect(c *Config) (*sql.DB, error) {
 }
 
 func PromoDiscount(db *sql.DB, promo string) (discount float64, err error) {
-	var expires string
-	selForm, err := db.Prepare(`SELECT
-		Expires, Discount
-		FROM Promos WHERE Code=?`)
+	selForm, err := db.Prepare(`SELECT Discount
+		FROM Promos WHERE Code=? AND
+		Expires >= CURRENT_TIMESTAMP`)
 	if err != nil { return }
-	err = selForm.QueryRow(promo).Scan(&expires, &discount)
+	err = selForm.QueryRow(promo).Scan(&discount)
 	return
 }
 
@@ -232,10 +232,10 @@ func (u UserProfile) Create(db *sql.DB, pass string) (UserProfile, error) {
 
 func LetMeIn(db *sql.DB, uname, pass string) (UserProfile, error) {
 	u, err := UserByName(db, uname)
-	if err != nil { return u, err }
+	if err != nil { return u, errors.New("Login Error") }
 
 	fail := CompareShadow(u.Shadow, pass)
-	if fail != nil { return u, err }
+	if fail != nil { return u, errors.New("Login Error") }
 
 	return u, nil
 }
