@@ -2,5 +2,5 @@
 <h1 class=displayname><a href="{{.Homepage}}">{{.DisplayName}}</a></h1>
 <span class="username subtext">{{.Username}}</span>
 <p>User since {{.JoinedOn}}</p>
-<a href="{{.Homepage}}/archive">View Archived Bookmarks</a>
-{{end}}
+{{if .ThisIsMe}}<a href="{{.Homepage}}/settings">Change account settings</a>
+{{end}}{{end}}

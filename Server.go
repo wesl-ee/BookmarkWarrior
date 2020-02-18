@@ -43,6 +43,7 @@ type UserAddPage struct {
 	Settings *Config }
 
 type LoginPage struct {
+	Error *LoginError
 	Settings *Config
 	UX *UserExperience }
 
@@ -70,6 +71,10 @@ type SignupError struct {
 	BadUName bool
 	ShortPassword bool
 	AlreadyLoggedIn bool }
+
+type LoginError struct {
+	DBError bool
+	CredsError bool }
 
 type SignupNewPage struct {
 	Settings *Config
@@ -362,7 +367,7 @@ func (ux *UserExperience) HandleUserEdit(res *ServerRes, mark Bookmark) {
 	}
 }
 
-func (ux *UserExperience) HandleLogin(res *ServerRes) {
+func (ux *UserExperience) HandleLogin(res *ServerRes, e *LoginError) {
 	w := res.Writer
 	r := res.Request
 	db := res.DB
@@ -370,13 +375,17 @@ func (ux *UserExperience) HandleLogin(res *ServerRes) {
 	tmpl := Templates[page]
 
 	// Handle login attempts
-	if (r.Method == "POST") {
+	if e == nil && r.Method == "POST" {
 		if err := r.ParseForm(); err != nil { panic(err) }
 		username := strings.ToLower(r.FormValue("username"))
 		password := r.FormValue("password")
 
 		u, err := LetMeIn(db, username, password)
-		if err != nil { panic(err) }
+		if err != nil {
+			w.WriteHeader(http.StatusUnauthorized)
+			ux.HandleLogin(res, &LoginError{CredsError: true})
+			return
+		}
 
 		ws := ThisSession(r)
 		ws.Associate(db, u.Username)
@@ -386,8 +395,10 @@ func (ux *UserExperience) HandleLogin(res *ServerRes) {
 	}
 
 	err := tmpl.Execute(w, LoginPage{
+		Error: e,
 		UX: ux,
 		Settings: &Settings })
+	log.Println(err)
 	if err != nil {
 		HandleWebError(w, r, http.StatusInternalServerError)
 	}
@@ -574,8 +585,14 @@ func (ux *UserExperience) HandleSignupPay(res *ServerRes) {
 			DisplayName: displayname, }
 
 		u, err := newUser.Create(db, password)
-		if err != nil { panic(err) }
-		fmt.Println(u)
+		if err != nil {
+			HandleWebError(w, r, http.StatusInternalServerError)
+			log.Println(err)
+			return
+		}
+
+		// Log to console
+		log.Printf("Created user %s (%s)\n", u.DisplayName, u.Username)
 
 		// Log us in immediately after acc. creation
 		ThisSession(r).Associate(db, u.Username)
@@ -694,7 +711,7 @@ func HandleReq(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	case "login":
-		ux.HandleLogin(res)
+		ux.HandleLogin(res, nil)
 	case "logout":
 		ux.HandleLogout(res)
 	case "u":
