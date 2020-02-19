@@ -14,7 +14,13 @@
 {{if not .User.Bookmarks}}
 <div class=tab-content>{{template "UserNoArchived" .User}}</div>
 {{else}}<table class="tab-content bookmarks">
-<tr><th>Name</th><th>Added on</th>{{if .User.ThisIsMe}}<th>Actions</th>{{end}}{{range .User.Bookmarks}}</tr>
+<tr>{{with .User}}<th>Name<span class=sort-arrows>
+		<a href="{{.Homepage}}?order=ascending-name">▲</a><!--
+		--><a href="{{.Homepage}}?order=descending-name">▼</a></span></th>
+	<th>Added on<span class=sort-arrows>
+		<a href="{{.Homepage}}?order=ascending-date">▲</a><!--
+		--><a href="{{.Homepage}}">▼</a></span></th>
+{{end}}{{if .User.ThisIsMe}}<th>Actions</th>{{end}}</tr>{{range .User.Bookmarks}}
 <tr><td>{{if .Unread}}<strong>{{end}}<a href="{{.URL}}">{{.Title}}</a>
 {{if .Unread}}</strong>{{end}}</td>
 <td><time datetime="{{.AddedOnRFC3339}}">{{.AddedOn}}</time></td>

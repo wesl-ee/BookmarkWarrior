@@ -134,6 +134,23 @@ func (ux *UserExperience) HandleWebIndex(res *ServerRes) {
 	}
 }
 
+func QueryAsOrder(q string) (*BOrder) {
+	switch(q) {
+		case "ascending-name": return &BOrder{
+			Parameter: SortByTitle,
+			Order: OrderAscending }
+		case "descending-name": return &BOrder{
+			Parameter: SortByTitle,
+			Order: OrderDescending }
+		case "ascending-date": return &BOrder{
+			Parameter: SortByAdded,
+			Order: OrderAscending }
+		case "descending-date": return &BOrder{
+			Parameter: SortByAdded,
+			Order: OrderDescending }
+		default: return nil }
+}
+
 func (ux *UserExperience) HandleUserReq(res *ServerRes, uname string) {
 	w := res.Writer
 	r := res.Request
@@ -147,9 +164,14 @@ func (ux *UserExperience) HandleUserReq(res *ServerRes, uname string) {
 		log.Println(err)
 		return }
 
-	marks, err := user.UnarchivedBookmarks(db, BOrder{
+	var order *BOrder
+	param, ok := res.Request.URL.Query()["order"]
+	if ok && len(param[0]) > 0 { order = QueryAsOrder(param[0]) }
+	if order == nil { order = &BOrder{
 		Parameter: SortByAdded,
-		Order: OrderAscending})
+		Order: OrderDescending } }
+
+	marks, err := user.UnarchivedBookmarks(db, order)
 	if err != nil {
 		// Databse error...
 		HandleWebError(w, r, http.StatusServiceUnavailable)
@@ -252,9 +274,14 @@ func (ux *UserExperience) HandleUserViewArchive(res *ServerRes, uname string) {
 			http.StatusNotFound)
 		return }
 
-	marks, err := user.ArchivedBookmarks(res.DB, BOrder{
+	var order *BOrder
+	param, ok := res.Request.URL.Query()["order"]
+	if ok && len(param[0]) > 0 { order = QueryAsOrder(param[0]) }
+	if order == nil { order = &BOrder{
 		Parameter: SortByAdded,
-		Order: OrderAscending})
+		Order: OrderDescending } }
+
+	marks, err := user.ArchivedBookmarks(res.DB, order)
 	if err != nil {
 		// Databse error...
 		HandleWebError(res.Writer, res.Request,

@@ -13,12 +13,12 @@ type BOrder struct {
 	Parameter string
 	Order string
 }
+
 const (
 	OrderAscending = "ASC"
 	OrderDescending = "DESC"
-)
-const (
 	SortByAdded = "AddedOn"
+	SortByTitle = "Title"
 )
 
 // Uplink to the Scrin mothership
@@ -157,7 +157,7 @@ func (b Bookmark) MarkUnread(db *sql.DB) (error) {
 	return err
 }
 
-func (u UserProfile) ArchivedBookmarks(db *sql.DB, order BOrder) (Bookmarks, error) {
+func (u UserProfile) ArchivedBookmarks(db *sql.DB, order *BOrder) (Bookmarks, error) {
 	var marks []Bookmark
 	q := `SELECT
 		BId, Username, URL, Title, Unread, Archived, AddedOn
@@ -180,7 +180,7 @@ func (u UserProfile) ArchivedBookmarks(db *sql.DB, order BOrder) (Bookmarks, err
 	return marks,err
 }
 
-func (u UserProfile) UnarchivedBookmarks(db *sql.DB, order BOrder) (Bookmarks, error) {
+func (u UserProfile) UnarchivedBookmarks(db *sql.DB, order *BOrder) (Bookmarks, error) {
 	var marks []Bookmark
 	q := `SELECT
 		BId, Username, URL, Title, Unread, Archived, AddedOn

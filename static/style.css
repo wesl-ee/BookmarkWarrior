@@ -64,6 +64,7 @@ th { text-align: left }
 	border: 1px solid;
 }
 
+.sort-arrows a { text-decoration: none; color: inherit }
 .tab-content { padding: 5px }
 
 .tabs, .tab-content {
@@ -105,6 +106,7 @@ a img { border: 1px solid }
 
 .tabs a, .remarkable.button-group a { text-decoration: none }
 
+.bookmarks { table-layout: fixed }
 .bookmarks tr > :last-child { float: right }
 
 /* Mobile... */
