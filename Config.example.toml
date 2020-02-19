@@ -7,6 +7,7 @@ Canon = "https://bookmarkwarrior.com/"
 Host = ":9001"
 SessionCookie = "Session"
 SessionExpiryDays = 14
+DateFormat = "January 2, 2006"
 
 [PayPal]
 OAuthAPI = "https://api.sandbox.paypal.com/v1/oauth2/token/"
@@ -19,6 +20,7 @@ DomesticCurrencySigil = "$"
 
 [Database]
 ConnectionString = "bookmarkboy:password@tcp(localhost)/bookmarkwarrior"
+DatetimeFormat = "2006-01-02 15:04:05"
 
 # html/template dependencies
 [[Templates]]
@@ -60,6 +62,13 @@ Dependencies = [ "tmpl/head.html",
 	"tmpl/signup-steps.html" ]
 
 [[Templates]]
+Name = "tmpl/signup-free.html"
+Dependencies = [ "tmpl/head.html",
+	"tmpl/footer.html",
+	"tmpl/header.html",
+	"tmpl/signup-steps.html" ]
+
+[[Templates]]
 Name = "tmpl/signup-receipt.html"
 Dependencies = [ "tmpl/head.html",
 	"tmpl/footer.html",
@@ -87,3 +96,63 @@ Dependencies = [ "tmpl/head.html",
 	"tmpl/footer.html",
 	"tmpl/header.html",
 	"tmpl/user-aside.html" ]
+
+[[Templates]]
+Name = "tmpl/user-settings.html"
+Dependencies = [ "tmpl/head.html",
+	"tmpl/footer.html",
+	"tmpl/header.html",
+	"tmpl/user-aside.html" ]
+
+[[Templates]]
+Name = "tmpl/user-change-password.html"
+Dependencies = [ "tmpl/head.html",
+	"tmpl/footer.html",
+	"tmpl/header.html",
+	"tmpl/user-aside.html" ]
+
+[[Templates]]
+Name = "tmpl/user-change-name.html"
+Dependencies = [ "tmpl/head.html",
+	"tmpl/footer.html",
+	"tmpl/header.html",
+	"tmpl/user-aside.html" ]
+
+[[Templates]]
+Name = "tmpl/user-derez.html"
+Dependencies = [ "tmpl/head.html",
+	"tmpl/footer.html",
+	"tmpl/header.html",
+	"tmpl/user-aside.html" ]
+
+[[Templates]]
+Name = "tmpl/privacy.html"
+Dependencies = [ "tmpl/head.html",
+	"tmpl/footer.html",
+	"tmpl/header.html",
+	"tmpl/my/welcome-sidebar.html",
+	"tmpl/my/info-privacy.html" ]
+
+[[Templates]]
+Name = "tmpl/about.html"
+Dependencies = [ "tmpl/head.html",
+	"tmpl/footer.html",
+	"tmpl/header.html",
+	"tmpl/my/welcome-sidebar.html",
+	"tmpl/my/info-about.html" ]
+
+[[Templates]]
+Name = "tmpl/technology.html"
+Dependencies = [ "tmpl/head.html",
+	"tmpl/footer.html",
+	"tmpl/header.html",
+	"tmpl/my/welcome-sidebar.html",
+	"tmpl/my/info-technology.html" ]
+
+[[Templates]]
+Name = "tmpl/mission.html"
+Dependencies = [ "tmpl/head.html",
+	"tmpl/footer.html",
+	"tmpl/header.html",
+	"tmpl/my/welcome-sidebar.html",
+	"tmpl/my/info-mission.html" ]
