@@ -14,7 +14,8 @@ type Config struct {
 	Templates []TemplateSettings }
 
 type DBSettings struct {
-	ConnectionString string }
+	ConnectionString string
+	DatetimeFormat string }
 
 type TemplateSettings struct {
 	Name string
@@ -34,7 +35,8 @@ type WebSettings struct {
 	Canon string
 	SessionCookie string
 	SessionExpiryDays int
-	Host string }
+	Host string
+	DateFormat string }
 
 const SYSDEFAULT_CONFIG string = "Config.toml"
 

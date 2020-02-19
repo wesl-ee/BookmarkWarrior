@@ -156,7 +156,7 @@ func (b Bookmark) MarkUnread(db *sql.DB) (error) {
 	return err
 }
 
-func (u UserProfile) ArchivedBookmarks(db *sql.DB, order BOrder) ([]Bookmark, error) {
+func (u UserProfile) ArchivedBookmarks(db *sql.DB, order BOrder) (Bookmarks, error) {
 	var marks []Bookmark
 	q := `SELECT
 		BId, Username, URL, Title, Unread, Archived, AddedOn
@@ -179,7 +179,7 @@ func (u UserProfile) ArchivedBookmarks(db *sql.DB, order BOrder) ([]Bookmark, er
 	return marks,err
 }
 
-func (u UserProfile) UnarchivedBookmarks(db *sql.DB, order BOrder) ([]Bookmark, error) {
+func (u UserProfile) UnarchivedBookmarks(db *sql.DB, order BOrder) (Bookmarks, error) {
 	var marks []Bookmark
 	q := `SELECT
 		BId, Username, URL, Title, Unread, Archived, AddedOn

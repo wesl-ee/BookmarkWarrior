@@ -2,9 +2,20 @@ package main
 
 import (
 	"net/url"
+	"log"
+	"time"
 )
 
-type BookmarkWeb struct {
+type Bookmarks []Bookmark
+
+type WebBookmark struct {
+	BId int
+	Username string
+	URL string
+	Title string
+	Unread bool
+	Archived bool
+	AddedOn string
 }
 
 type Bookmark struct {
@@ -36,3 +47,29 @@ func IsURL(str string) bool {
 		return false }
 	return true
 }
+
+func FormatDBDate(d string) (string) {
+	t, _ := time.Parse(Settings.Database.DatetimeFormat, d)
+	log.Println(d)
+	log.Println(Settings.Database.DatetimeFormat)
+	return t.Format(Settings.Web.DateFormat)
+}
+
+func (marks Bookmarks) AsWebEntities() (wb []WebBookmark) {
+	for _, b := range marks {
+		wb = append(wb, b.AsWebEntity())
+	}
+	return
+}
+
+func (b *Bookmark) AsWebEntity() (wb WebBookmark) {
+	wb.BId = b.BId
+	wb.Username = b.Username
+	wb.URL = b.URL
+	wb.Title = b.Title
+	wb.Unread = b.Unread
+	wb.Archived = b.Archived
+	wb.AddedOn = FormatDBDate(b.AddedOn)
+	return
+}
+

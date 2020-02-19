@@ -158,7 +158,7 @@ func (ux *UserExperience) HandleUserReq(res *ServerRes, uname string) {
 	}
 
 	webuser:= user.AsWebEntity()
-	webuser.Bookmarks = marks
+	webuser.Bookmarks = marks.AsWebEntities()
 	webuser.ThisIsMe = ux.Username == uname
 
 	tmpl := Templates[page]
@@ -264,7 +264,7 @@ func (ux *UserExperience) HandleUserViewArchive(res *ServerRes, uname string) {
 	}
 
 	webuser:= user.AsWebEntity()
-	webuser.Bookmarks = marks
+	webuser.Bookmarks = marks.AsWebEntities()
 	webuser.ThisIsMe = ux.Username == uname
 
 	tmpl := Templates[page]
