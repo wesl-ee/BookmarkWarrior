@@ -17,7 +17,7 @@
 <tr><th>Name</th><th>Added on</th>{{if .User.ThisIsMe}}<th>Actions</th>{{end}}{{range .User.Bookmarks}}</tr>
 <tr><td>{{if .Unread}}<strong>{{end}}<a rel=nofollow href="{{.URL}}">{{.Title}}</a>
 {{if .Unread}}</strong>{{end}}</td>
-<td>{{.AddedOn}}</td>
+<td><time datetime="{{.AddedOnRFC3339}}">{{.AddedOn}}</time></td>
 {{if $.User.ThisIsMe}}<td class="simple button-group">
 	<span class=read>{{if .Unread}}<a
 		href="{{$.Canon}}/{{.BId}}/read">Mark as Read</a>{{else}}

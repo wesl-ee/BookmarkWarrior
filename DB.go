@@ -260,3 +260,10 @@ func FormatDBDate(d string) (string) {
 	return t.Format(Settings.Web.DateFormat)
 }
 
+func ParseDBDate(d string) (time.Time, error) {
+	return time.Parse(Settings.Database.DatetimeFormat, d)
+}
+
+func WebDate(t time.Time) (string) { return t.Format(Settings.Web.DateFormat) }
+func RFC3339Date(t time.Time) (string) { return t.Format(time.RFC3339) }
+

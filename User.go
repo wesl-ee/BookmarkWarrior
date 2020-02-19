@@ -10,6 +10,7 @@ type WebUserProfile struct {
 	Username string
 	DisplayName string
 	JoinedOn string
+	JoinedOnRFC3339 string
 	Bookmarks []WebBookmark
 	Homepage string
 	ThisIsMe bool
@@ -24,9 +25,12 @@ type UserProfile struct {
 }
 
 func (u *UserProfile) AsWebEntity() (wu WebUserProfile) {
+	t, _ := ParseDBDate(u.JoinedOn)
+
 	wu.Username = u.Username
 	wu.DisplayName = u.DisplayName
-	wu.JoinedOn = FormatDBDate(u.JoinedOn)
+	wu.JoinedOn = WebDate(t)
+	wu.JoinedOnRFC3339 = RFC3339Date(t)
 	wu.Homepage = Settings.Web.Canon + "u/" + u.Username
 	return
 }

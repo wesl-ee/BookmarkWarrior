@@ -14,6 +14,7 @@ type WebBookmark struct {
 	Unread bool
 	Archived bool
 	AddedOn string
+	AddedOnRFC3339 string
 }
 
 type Bookmark struct {
@@ -54,13 +55,16 @@ func (marks Bookmarks) AsWebEntities() (wb []WebBookmark) {
 }
 
 func (b *Bookmark) AsWebEntity() (wb WebBookmark) {
+	t, _ := ParseDBDate(b.AddedOn)
+
 	wb.BId = b.BId
 	wb.Username = b.Username
 	wb.URL = b.URL
 	wb.Title = b.Title
 	wb.Unread = b.Unread
 	wb.Archived = b.Archived
-	wb.AddedOn = FormatDBDate(b.AddedOn)
+	wb.AddedOn = WebDate(t)
+	wb.AddedOnRFC3339 = RFC3339Date(t)
 	return
 }
 
