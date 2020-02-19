@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"time"
 	"errors"
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -253,3 +254,9 @@ func LetMeIn(db *sql.DB, uname, pass string) (UserProfile, error) {
 
 	return u, nil
 }
+
+func FormatDBDate(d string) (string) {
+	t, _ := time.Parse(Settings.Database.DatetimeFormat, d)
+	return t.Format(Settings.Web.DateFormat)
+}
+

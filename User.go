@@ -26,7 +26,7 @@ type UserProfile struct {
 func (u *UserProfile) AsWebEntity() (wu WebUserProfile) {
 	wu.Username = u.Username
 	wu.DisplayName = u.DisplayName
-	wu.JoinedOn = u.JoinedOn
+	wu.JoinedOn = FormatDBDate(u.JoinedOn)
 	wu.Homepage = Settings.Web.Canon + "u/" + u.Username
 	return
 }

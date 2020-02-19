@@ -2,8 +2,6 @@ package main
 
 import (
 	"net/url"
-	"log"
-	"time"
 )
 
 type Bookmarks []Bookmark
@@ -46,13 +44,6 @@ func IsURL(str string) bool {
 		!(u.Scheme == "http" || u.Scheme == "https") {
 		return false }
 	return true
-}
-
-func FormatDBDate(d string) (string) {
-	t, _ := time.Parse(Settings.Database.DatetimeFormat, d)
-	log.Println(d)
-	log.Println(Settings.Database.DatetimeFormat)
-	return t.Format(Settings.Web.DateFormat)
 }
 
 func (marks Bookmarks) AsWebEntities() (wb []WebBookmark) {
