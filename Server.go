@@ -65,6 +65,13 @@ type InfoPage struct {
 	UX *UserExperience
 	Settings *Config }
 
+type UserSettingsPage struct {
+	Canon string
+	Title string
+	User WebUserProfile
+	UX *UserExperience
+	Settings *Config }
+
 type SignupError struct {
 	Mismatch bool
 	Taken bool
@@ -204,11 +211,96 @@ func (ux *UserExperience) HandleLogout(res *ServerRes) {
 	http.Redirect(res.Writer, res.Request, "/", http.StatusSeeOther)
 }
 
+func (ux *UserExperience) HandleUserSettings(res *ServerRes, uname, option string) {
+	user, err := UserByName(res.DB, uname)
+	if err != nil {
+		HandleWebError(res.Writer, res.Request, http.StatusNotFound)
+		return }
+
+	if !ux.LoggedIn {
+		http.Redirect(res.Writer, res.Request, "/login", http.StatusSeeOther)
+		log.Println(err)
+		return
+	}
+
+	if ux.Username != uname {
+		HandleWebError(res.Writer, res.Request, http.StatusForbidden)
+		log.Println(err)
+		return }
+
+	if (res.Request.Method == "POST") {
+		if err := res.Request.ParseForm(); err != nil {
+			HandleWebError(res.Writer, res.Request,
+				http.StatusInternalServerError)
+			log.Println(err)
+			return
+		}
+		switch(option) {
+		case "derez":
+			derez := res.Request.FormValue("derez")
+			password := res.Request.FormValue("password")
+
+			if derez == "" {
+				return // TODO: P-R-G
+			}
+			u, err := LetMeIn(res.DB, uname, password)
+			if err != nil {
+				return // TODO: P-R-G
+			}
+
+			// Actually delete the account
+			// ...
+			log.Printf("User %s (%s) has opted to delete their account!",
+				u.DisplayName, u.Username)
+			err = u.Derez(res.DB)
+			if err != nil {
+				log.Printf("Failed to delete user %s (%s): %s",
+					u.DisplayName, u.Username, err)
+			} else {
+				log.Printf("Successfully derezzed %s (%s)",
+					u.DisplayName, u.Username)
+			}
+			http.Redirect(res.Writer, res.Request,
+				Settings.Web.Canon, http.StatusSeeOther)
+		case "change-name": // ...
+		case "change-password": // ...
+		}
+		return
+	}
+
+	var page string
+	switch(option) {
+	case "change-name":
+		page = "tmpl/user-change-name.html"
+	case "change-password":
+		page = "tmpl/user-change-password.html"
+	case "derez":
+		page = "tmpl/user-derez.html"
+	case "":
+		page = "tmpl/user-settings.html"
+	}
+
+	tmpl := Templates[page]
+	webuser:= user.AsWebEntity()
+	webuser.ThisIsMe = ux.Username == uname
+
+	err = tmpl.Execute(res.Writer, UserSettingsPage{
+		Canon: Settings.Web.Canon + "u/" + uname,
+		User: webuser,
+		Title: user.DisplayName + " (" + uname + ") - Settings",
+		UX: ux,
+		Settings: &Settings })
+	if err != nil {
+		HandleWebError(res.Writer, res.Request,
+			http.StatusInternalServerError)
+		log.Println(err)
+	}
+}
+
 func (ux *UserExperience) HandleUserAdd(res *ServerRes, uname string) {
 	user, err := UserByName(res.DB, uname)
 	if err != nil {
 		HandleWebError(res.Writer, res.Request, http.StatusNotFound)
-		log.Println(err)
 		return }
 
 	if !ux.LoggedIn {
@@ -429,7 +521,6 @@ func (ux *UserExperience) HandleLogin(res *ServerRes, e *LoginError) {
 		Error: e,
 		UX: ux,
 		Settings: &Settings })
-	log.Println(err)
 	if err != nil {
 		HandleWebError(w, r, http.StatusInternalServerError)
 	}
@@ -749,15 +840,21 @@ func HandleReq(w http.ResponseWriter, r *http.Request) {
 		switch(len(args)) {
 		case 3:
 			uname := args[0]
-			bID, err := strconv.Atoi(args[1])
-			action := args[2]
+			if args[1] == "settings" {
+				// User settings at /u/{USER}/settings/{OPTION}
+				option := args[2]
+				ux.HandleUserSettings(res, uname, option)
+			} else {
+				// Edit bookmark /u/{USER}/{ID}/{ACTION}
+				bID, err := strconv.Atoi(args[1])
+				action := args[2]
 
-			if err != nil {
-				HandleWebError(w, r, http.StatusBadRequest)
-				return
+				if err != nil {
+					HandleWebError(w, r, http.StatusBadRequest)
+					return
+				}
+				ux.HandleBMarkAction(res, uname, bID, action)
 			}
-
-			ux.HandleBMarkAction(res, uname, bID, action)
 		case 2:
 			uname := args[0]
 			action := args[1]
@@ -765,6 +862,8 @@ func HandleReq(w http.ResponseWriter, r *http.Request) {
 			switch(action) {
 			case "add": ux.HandleUserAdd(res, uname)
 			case "archive": ux.HandleUserViewArchive(res, uname)
+			case "settings": ux.HandleUserSettings(res, uname, "")
+			default: HandleWebError(w, r, http.StatusNotFound)
 			}
 		case 1:
 			uname := args[0]

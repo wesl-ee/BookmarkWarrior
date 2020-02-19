@@ -157,6 +157,27 @@ func (b Bookmark) MarkUnread(db *sql.DB) (error) {
 	return err
 }
 
+func (u UserProfile) DeleteSessions(db *sql.DB) (error) {
+	q := `DELETE FROM Sessions WHERE Username=?`
+	delForm, err := db.Prepare(q)
+	if err != nil { return err }
+	_, err = delForm.Exec(u.Username)
+	return err
+}
+
+func (u UserProfile) Derez(db *sql.DB) (error) {
+	// Clear sessions first...
+	err := u.DeleteSessions(db)
+	if err != nil { return err }
+
+	// ...then actually derez the user
+	q := `DELETE FROM Users WHERE Username=?`
+	delForm, err := db.Prepare(q)
+	if err != nil { return err }
+	_, err = delForm.Exec(u.Username)
+	return err
+}
+
 func (u UserProfile) ArchivedBookmarks(db *sql.DB, order *BOrder) (Bookmarks, error) {
 	var marks []Bookmark
 	q := `SELECT

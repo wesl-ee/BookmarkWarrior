@@ -77,9 +77,10 @@ a:active { outline: 0 }
 a, a:visited { color: blue }
 a:hover { color: red }
 
-.tab-content input { width: calc(100% - 50px) }
+.tab-content.add input[type=text] { width: calc(100% - 50px) }
+.tab-content input { margin: 5px 0 }
 form label, input { display: block }
-input {
+input[type=text], input[type=password] {
 	border: 1px solid;
 	font-size: 110%;
 	padding: 2px;
@@ -90,7 +91,7 @@ input {
 button[type=submit] {
 	background-color: white;
 	border: 1px solid;
-	font-size: 125% }
+	font-size: 110% }
 
 .subtext { font-style: italic; font-size: 90% }
 

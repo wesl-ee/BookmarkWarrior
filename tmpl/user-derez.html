@@ -1,0 +1,35 @@
+<!DOCTYPE HTML>
+<html>
+<head>{{template "Head" .}}
+<title>{{.Title}}</title></head>
+<body>
+<header>{{template "Header" .}}</header>
+<aside>{{template "UserAside" .User}}</aside>
+<main class=tabbed-window>
+<ul class=tabs>
+	<li><a href="{{.Canon}}">Bookmarks</a></li><!--
+	--><li><a href="{{.Canon}}/archive">Archive</a></li><!--
+	--><li><a href="{{.Canon}}/add">Add</a>
+</ul>
+<div class=tab-content>
+<form method=post>
+	<h2>Delete Account</h2>
+	<p>By completing this form you agree that the service provided by
+	Bookmark Warrior to you will be terminated IMMEDIATELY and that
+	any prior payment made to Bookmark Warrior in exchange for services
+	related to this account are nonrecoverable upon the submission of this
+	request for account termination.</p>
+	<div><label for=derez>Yes, actually delete my account:</label>
+	<input id=derez type=checkbox name=derez></div>
+	<p>We require you to enter your password in order to complete the
+	deletion process; we'll be sad to see you go! There is no undoing this
+	termination request.</p>
+	<div><label for=username>Password: <abbr title=Required
+		aria-label=Required>*</abbr></label>
+	<input id=password type=password name=password autocomplete=off></div>
+	<button type=submit>Confirm</button>
+</form></div>
+</main>
+<footer>{{template "Footer" .}}</footer>
+</body>
+</html>

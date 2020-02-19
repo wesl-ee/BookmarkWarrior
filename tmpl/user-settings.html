@@ -1,0 +1,27 @@
+<!DOCTYPE HTML>
+<html>
+<head>{{template "Head" .}}
+<title>{{.Title}}</title></head>
+<body>
+<header>{{template "Header" .}}</header>
+<aside>{{template "UserAside" .User}}</aside>
+<main class=tabbed-window>
+<ul class=tabs>
+	<li><a href="{{.Canon}}">Bookmarks</a></li><!--
+	--><li><a href="{{.Canon}}/archive">Archive</a></li><!--
+	--><li><a href="{{.Canon}}/add">Add</a>
+</ul>
+<div class=tab-content>
+<h2>Options</h2>
+<ul><li><a href="{{.Canon}}/settings/change-name">Change my Display Name</a></li>
+<li><a href="{{.Canon}}/settings/change-password">Change Password</a></li>
+</ul>
+<hr>
+<h3>Danger Zone</h3>
+<ul><li><a href="{{.Canon}}/settings/derez">Delete my Account</a></li>
+</ul>
+</div>
+</main>
+<footer>{{template "Footer" .}}</footer>
+</body>
+</html>
