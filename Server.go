@@ -280,6 +280,7 @@ func (ux *UserExperience) HandleUserSettings(res *ServerRes, uname, option strin
 			if newname == u.DisplayName {
 				http.Redirect(res.Writer, res.Request,
 					Settings.Web.Canon + "/u/" + uname, http.StatusSeeOther)
+				return
 			}
 
 			if !ValidDisplayName(newname) {
