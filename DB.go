@@ -254,6 +254,16 @@ func (u UserProfile) Bookmarks(db *sql.DB) (map[int]Bookmark, error) {
 	return marks,err
 }
 
+func (u UserProfile) NewPassword(db *sql.DB, pass string) error {
+	shadow := DoShadow(pass)
+	q := `UPDATE Users SET Shadow=? WHERE Username=?`
+	upForm, err := db.Prepare(q)
+	if err != nil { return err }
+
+	_, err = upForm.Exec(shadow, u.Username)
+	return err
+}
+
 func (u UserProfile) Create(db *sql.DB, pass string) (UserProfile, error) {
 	shadow := DoShadow(pass)
 	apisecret := APISecret()

@@ -77,7 +77,7 @@ a:active { outline: 0 }
 a, a:visited { color: blue }
 a:hover { color: red }
 
-.tab-content.add input[type=text] { width: calc(100% - 50px) }
+.tab-content.add-edit input[type=text] { width: calc(100% - 50px) }
 .tab-content input { margin: 5px 0 }
 form label, input { display: block }
 input[type=text], input[type=password] {

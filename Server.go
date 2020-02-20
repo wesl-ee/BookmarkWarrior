@@ -79,6 +79,7 @@ type SignupError struct {
 	BadUName bool
 	BadDispName bool
 	ShortPassword bool
+	BadPassword bool
 	AlreadyLoggedIn bool }
 
 type LoginError struct {
@@ -300,7 +301,34 @@ func (ux *UserExperience) HandleUserSettings(res *ServerRes, uname, option strin
 				http.Redirect(res.Writer, res.Request,
 					Settings.Web.Canon + "/u/" + uname, http.StatusSeeOther)
 				}
-		case "change-password": // ...
+		case "change-password":
+			currpassword := res.Request.FormValue("currpassword")
+			newpassword := res.Request.FormValue("newpassword")
+			confirmpassword := res.Request.FormValue("confirmpassword")
+
+			if newpassword != confirmpassword {
+				procErr = &SignupError{ Mismatch: true }
+				break
+			}
+
+			u, err := LetMeIn(res.DB, uname, currpassword)
+			if err != nil {
+				procErr = &SignupError{ BadPassword: true }
+				break
+			}
+
+			err = u.NewPassword(res.DB, newpassword)
+			if err != nil {
+				log.Println(err)
+				HandleWebError(res.Writer, res.Request,
+					http.StatusInternalServerError)
+				return
+			}
+
+			log.Printf("User %s (%s) changed their password!",
+				u.DisplayName, uname)
+			http.Redirect(res.Writer, res.Request,
+				Settings.Web.Canon + "/u/" + uname, http.StatusSeeOther)
 		}
 	}
 
