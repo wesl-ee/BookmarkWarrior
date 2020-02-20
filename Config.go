@@ -1,6 +1,9 @@
 package main
 
 import (
+	"os"
+	"log"
+	"errors"
 	"github.com/BurntSushi/toml"
 )
 
@@ -38,12 +41,27 @@ type WebSettings struct {
 	Host string
 	DateFormat string }
 
-const SYSDEFAULT_CONFIG string = "Config.toml"
+var CONFIG_DEFAULT_LOCS = [...]string{
+	"Config.toml" }
 
 func ReadDefaultConfig(c *Config) (error) {
-	return ReadConfig(c, SYSDEFAULT_CONFIG); }
+	for _, f := range CONFIG_DEFAULT_LOCS {
+		if FExists(f) {
+			return ReadConfig(c, f)
+		}
+	}
+
+	return errors.New("Could not find config file!")
+}
 
 func ReadConfig(c *Config, fpath string) (err error) {
+	log.Printf("Loading configuration file: %s\n", fpath)
 	_, err = toml.DecodeFile(fpath, c)
 	return
+}
+
+func FExists(fname string) bool {
+	info, err := os.Stat(fname)
+	if os.IsNotExist(err) { return false }
+	return !info.IsDir()
 }
