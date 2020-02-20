@@ -254,14 +254,14 @@ func (ux *UserExperience) HandleUserSettings(res *ServerRes, uname, option strin
 
 			// Actually delete the account
 			// ...
-			log.Printf("User %s (%s) has opted to delete their account!",
+			log.Printf("User %s (@%s) has opted to delete their account!",
 				u.DisplayName, u.Username)
 			err = u.Derez(res.DB)
 			if err != nil {
-				log.Printf("Failed to delete user %s (%s): %s",
+				log.Printf("Failed to delete user %s (@%s): %s",
 					u.DisplayName, u.Username, err)
 			} else {
-				log.Printf("Successfully derezzed %s (%s)",
+				log.Printf("Successfully derezzed %s (@%s)",
 					u.DisplayName, u.Username)
 			}
 			http.Redirect(res.Writer, res.Request,
@@ -296,7 +296,7 @@ func (ux *UserExperience) HandleUserSettings(res *ServerRes, uname, option strin
 					return
 				}
 
-				log.Printf("User %s (%s) changed name -> %s\n",
+				log.Printf("User %s (@%s) changed name -> %s\n",
 					u.DisplayName, u.Username, newname)
 				http.Redirect(res.Writer, res.Request,
 					Settings.Web.Canon + "/u/" + uname, http.StatusSeeOther)
@@ -325,7 +325,7 @@ func (ux *UserExperience) HandleUserSettings(res *ServerRes, uname, option strin
 				return
 			}
 
-			log.Printf("User %s (%s) changed their password!",
+			log.Printf("User %s (@%s) changed their password!",
 				u.DisplayName, uname)
 			http.Redirect(res.Writer, res.Request,
 				Settings.Web.Canon + "/u/" + uname, http.StatusSeeOther)

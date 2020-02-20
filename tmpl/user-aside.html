@@ -1,6 +1,6 @@
 {{define "UserAside"}}
 <h1 class=displayname><a href="{{.Homepage}}">{{.DisplayName}}</a></h1>
-<span class="username subtext">{{.Username}}</span>
+<span class="username subtext">@{{.Username}}</span>
 <p>User since <time datetime="{{.JoinedOnRFC3339}}">{{.JoinedOn}}</time></p>
 {{if .ThisIsMe}}<a href="{{.Homepage}}/settings">Change account settings</a>
 {{end}}{{end}}
