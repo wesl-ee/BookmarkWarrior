@@ -59,6 +59,9 @@ func UserByName(db *sql.DB, uname string) (u UserProfile, err error) {
 }
 
 func (b Bookmark) Add(db *sql.DB) (error) {
+	err := UpdateSiteStats(db, "Bookmarks", 1)
+	if err != nil { return err }
+
 	q := `INSERT INTO Bookmarks
 		(Username, Title, URL) VALUES (?, ?, ?)`
 	insForm, err := db.Prepare(q)
@@ -99,6 +102,9 @@ func (b Bookmark) Unarchive(db *sql.DB) (error) {
 }
 
 func (b Bookmark) Del(db *sql.DB) (error) {
+	err := UpdateSiteStats(db, "Bookmarks", -1)
+	if err != nil { return err }
+
 	q := `DELETE FROM Bookmarks
 		WHERE BId=?`
 	delForm, err := db.Prepare(q)
@@ -173,9 +179,24 @@ func (u UserProfile) DeleteSessions(db *sql.DB) (error) {
 	return err
 }
 
+func UpdateSiteStats(db *sql.DB, metric string, num int) error {
+	// Update site-wide statistics
+	q := `INSERT INTO SiteUsage (Metric, Value) VALUES
+		(?, ?) ON DUPLICATE KEY UPDATE
+		Value=Value+?`
+
+	insForm, err := db.Prepare(q)
+	if err != nil { return err }
+	_, err = insForm.Exec(metric, num, num)
+	return err
+}
+
 func (u UserProfile) Derez(db *sql.DB) (error) {
 	// Clear sessions first...
 	err := u.DeleteSessions(db)
+	if err != nil { return err }
+
+	err = UpdateSiteStats(db, "Users", -1)
 	if err != nil { return err }
 
 	// ...then actually derez the user
@@ -254,6 +275,47 @@ func (u UserProfile) Bookmarks(db *sql.DB) (map[int]Bookmark, error) {
 	return marks,err
 }
 
+func SiteUsage(db *sql.DB) (*Usage, error) {
+	ret := new(Usage)
+	q := `SELECT Metric, Value, Period FROM SiteUsage
+		ORDER BY Metric, Period`
+	selForm, err := db.Prepare(q)
+	if err != nil { return nil, err }
+
+	var u *UsageStat
+	var metric, lastMetric, period string
+	var runningSum, value int
+	rows, err := selForm.Query()
+	for rows.Next() {
+		rows.Scan(&metric, &value, &period)
+
+		if metric != lastMetric {
+			runningSum = 0
+			u = new(UsageStat)
+			switch (metric) {
+			case "Users":
+				ret.Users = u
+				u.Title = "User Growth"
+			case "Bookmarks":
+				ret.Bookmarks = u
+				u.Title = "Bookmarks Indexed"
+			}
+		}
+
+		runningSum += value
+
+		u.Values = append(u.Values, runningSum)
+		u.Titles = append(u.Titles, period)
+
+		if runningSum > u.Max {
+			u.Max = runningSum }
+
+		lastMetric = metric
+	}
+
+	return ret, nil
+}
+
 func (u UserProfile) NewPassword(db *sql.DB, pass string) error {
 	shadow := DoShadow(pass)
 	q := `UPDATE Users SET Shadow=? WHERE Username=?`
@@ -269,8 +331,11 @@ func (u UserProfile) Create(db *sql.DB, pass string) (UserProfile, error) {
 	apisecret := APISecret()
 
 	q := `INSERT INTO Users
-		(Username, DisplayName, Shadow, APISecret) VALUES
-		(?, ?, ?, ?)`
+	(Username, DisplayName, Shadow, APISecret) VALUES
+	(?, ?, ?, ?)`
+
+	err := UpdateSiteStats(db, "Users", 1)
+	if err != nil { return UserProfile{}, err }
 
 	insForm, err := db.Prepare(q)
 	if err != nil { return UserProfile{}, err }

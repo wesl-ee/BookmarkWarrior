@@ -1,0 +1,6 @@
+{{define "BarGraph"}}
+<figure class=bargraph>
+<figcaption>{{.Title}}</figcaption>
+<dl>{{range .Data}}
+<dt>{{.Title}}</dt><dd style="width:{{.Width}}">{{.Value}}</dd>
+{{end}}</ul></figure>{{end}}

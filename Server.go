@@ -24,6 +24,8 @@ func PageDependencies(page string) ([]string) {
 }
 
 type IndexPage struct {
+	UserGraph *Bargraph
+	BookmarkGraph *Bargraph
 	UX *UserExperience
 	Settings *Config }
 
@@ -135,8 +137,14 @@ func (ux *UserExperience) HandleWebIndex(res *ServerRes) {
 	r := res.Request
 	page := "tmpl/index.html"
 
+	usage, _ := SiteUsage(res.DB)
+	b := usage.Users.AsBarGraph()
+	c := usage.Bookmarks.AsBarGraph()
+
 	tmpl := Templates[page]
 	err := tmpl.Execute(w, IndexPage{
+		UserGraph: &b,
+		BookmarkGraph: &c,
 		Settings: &Settings,
 		UX: ux})
 	if err != nil {

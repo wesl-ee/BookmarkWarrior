@@ -35,10 +35,37 @@ input[readonly] {
 
 .error { color: red }
 
+.bargraph dl {
+	font-size: 0.75rem;
+	padding: 0;
+	position: relative;
+	width: 80%;
+
+	display: grid;
+	grid-template-columns: auto 1fr;
+}
+
+.bargraph dt { grid-column: 1;
+	padding: 2px 10px 2px 0}
+
+
+.bargraph dd {
+	grid-column: 2;
+	box-sizing: border-box;
+	padding: 2px 5px;
+	margin: 0;
+	list-style: none;
+	text-align: right }
+
+.bargraph dd { background-color: black;
+	color: white }
+
 /* Layouts */
 body > header .button-group {
 	float: right }
-table { width: 100%; border-spacing: 0 6px }
+table { border-spacing: 6px }
+table.site-usage { margin: auto }
+table.tab-content { width: 100% }
 .bill { background-color: white; border: 1px solid }
 .displayname { margin: 10px 0 }
 th { text-align: left }
