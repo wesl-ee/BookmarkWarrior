@@ -1,0 +1,34 @@
+<!DOCTYPE HTML>
+<html>
+<head>{{template "Head" .}}
+<title>{{.Title}}</title></head>
+<body>
+<header>{{template "Header" .}}</header>
+<aside>{{template "UserAside" .User}}</aside>
+<main class=tabbed-window>
+<ul class=tabs>
+	<li><a href="{{.Canon}}">Bookmarks</a></li><!--
+	--><li><a href="{{.Canon}}/archive">Archive</a></li><!--
+	--><li><a href="{{.Canon}}/add">Add</a>
+</ul>
+<div class=tab-content>
+	<h2>Change Display Name</h2>
+	<p>The below form will change your <strong>display name</strong> only,
+	which may not be more than {{.Settings.MaxDisplaynameLength}}
+	characters long.</p>
+{{if .Error}}<span class=error>
+	{{if .Error.BadDispName}}Bad Dipslay Name{{end}}
+</span>{{end}}
+<form method=post>
+	<p>Your username ({{.UX.Username}}) will stay the same.</p>
+	<div><label for=newname>New Name: <abbr title=Required
+		aria-label=Required>*</abbr></label>
+	<input id=newname type=text name=newname
+		value="{{.User.DisplayName}}"
+		maxlength="{{.Settings.MaxDisplaynameLength}}"></div>
+	<button type=submit>Confirm</button>
+</form></div>
+</main>
+<footer>{{template "Footer" .}}</footer>
+</body>
+</html>

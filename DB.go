@@ -157,6 +157,14 @@ func (b Bookmark) MarkUnread(db *sql.DB) (error) {
 	return err
 }
 
+func (u UserProfile) ChangeDisplayName(db *sql.DB, newname string) error {
+	q := `UPDATE Users SET DisplayName=? WHERE Username=?`
+	upForm, err := db.Prepare(q)
+	if err != nil { return err }
+	_, err = upForm.Exec(newname, u.Username)
+	return err
+}
+
 func (u UserProfile) DeleteSessions(db *sql.DB) (error) {
 	q := `DELETE FROM Sessions WHERE Username=?`
 	delForm, err := db.Prepare(q)

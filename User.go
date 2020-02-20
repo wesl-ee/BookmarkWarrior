@@ -66,6 +66,10 @@ func ValidUsername(uname string) (bool) {
 	return len(uname) <= Settings.MaxUsernameLength
 }
 
+func ValidDisplayName(dname string) bool {
+	return len(dname) <= Settings.MaxDisplaynameLength
+}
+
 func ValidPassword(pass string) (bool) {
 	return len(pass) >= Settings.MinimumPasswordLength
 }

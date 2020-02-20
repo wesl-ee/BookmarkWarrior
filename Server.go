@@ -67,6 +67,7 @@ type InfoPage struct {
 
 type UserSettingsPage struct {
 	Canon string
+	Error *SignupError
 	Title string
 	User WebUserProfile
 	UX *UserExperience
@@ -76,6 +77,7 @@ type SignupError struct {
 	Mismatch bool
 	Taken bool
 	BadUName bool
+	BadDispName bool
 	ShortPassword bool
 	AlreadyLoggedIn bool }
 
@@ -228,6 +230,7 @@ func (ux *UserExperience) HandleUserSettings(res *ServerRes, uname, option strin
 		log.Println(err)
 		return }
 
+	var procErr *SignupError
 	if (res.Request.Method == "POST") {
 		if err := res.Request.ParseForm(); err != nil {
 			HandleWebError(res.Writer, res.Request,
@@ -262,10 +265,42 @@ func (ux *UserExperience) HandleUserSettings(res *ServerRes, uname, option strin
 			}
 			http.Redirect(res.Writer, res.Request,
 				Settings.Web.Canon, http.StatusSeeOther)
-		case "change-name": // ...
+			return
+		case "change-name":
+			newname := res.Request.FormValue("newname")
+
+			u, err := UserByName(res.DB, uname)
+			if err != nil {
+				log.Println(err)
+				HandleWebError(res.Writer, res.Request,
+					http.StatusInternalServerError)
+				return
+			}
+
+			if newname == u.DisplayName {
+				http.Redirect(res.Writer, res.Request,
+					Settings.Web.Canon + "/u/" + uname, http.StatusSeeOther)
+			}
+
+			if !ValidDisplayName(newname) {
+				procErr = &SignupError{ BadDispName: true }
+			} else {
+				// ...
+				err = u.ChangeDisplayName(res.DB, newname)
+				if err != nil {
+					log.Println(err)
+					HandleWebError(res.Writer, res.Request,
+						http.StatusInternalServerError)
+					return
+				}
+
+				log.Printf("User %s (%s) changed name -> %s\n",
+					u.DisplayName, u.Username, newname)
+				http.Redirect(res.Writer, res.Request,
+					Settings.Web.Canon + "/u/" + uname, http.StatusSeeOther)
+				}
 		case "change-password": // ...
 		}
-		return
 	}
 
 	var page string
@@ -286,6 +321,7 @@ func (ux *UserExperience) HandleUserSettings(res *ServerRes, uname, option strin
 
 	err = tmpl.Execute(res.Writer, UserSettingsPage{
 		Canon: Settings.Web.Canon + "u/" + uname,
+		Error: procErr,
 		User: webuser,
 		Title: user.DisplayName + " (" + uname + ") - Settings",
 		UX: ux,
