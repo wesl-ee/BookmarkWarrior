@@ -27,6 +27,18 @@ type Bookmark struct {
 	AddedOn string
 }
 
+type URLError struct {
+	ParseError bool
+	BadScheme bool
+	NoHost bool
+}
+
+func (e *URLError) Error() string {
+	if e.ParseError { return "URL must start with http:// or https://" }
+	if e.NoHost { return "No host was specified" }
+	return "Not a URL"
+}
+
 /* func (u *UserProfile) AsWebEntity() (wu WebUserProfile) {
 	wu.Username = u.Username
 	wu.DisplayName = u.DisplayName
@@ -34,17 +46,14 @@ type Bookmark struct {
 	return
 } */
 
-func IsURL(str string) bool {
+func IsURL(str string) error {
 	u, err := url.Parse(str)
 
-	if u.Host == "" {
-		return false }
+	if !(u.Scheme == "http" || u.Scheme == "https") {
+		return &URLError{ BadScheme: true } }
+	if u.Host == "" { return &URLError{ NoHost: true } }
 
-	if err != nil ||
-		u.Host == "" ||
-		!(u.Scheme == "http" || u.Scheme == "https") {
-		return false }
-	return true
+	return err
 }
 
 func (marks Bookmarks) AsWebEntities() (wb []WebBookmark) {

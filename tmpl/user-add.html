@@ -12,6 +12,11 @@
 	--><li><strong><a href="{{.Canon}}/add">Add</a></strong>
 </ul>
 <div class="tab-content add-edit">
+{{if .Error}}<span class=error>
+	{{if .Error.URLBadScheme}}Websites must start with http:// or https://{{end}}
+	{{if .Error.URLNoHost}}No host given (must be a valid remote URL){{end}}
+	{{if .Error.URLOther}}Bad URL!{{end}}
+</span>{{end}}
 <form method=post>
 	<div><label for=url>URL: <abbr title=Required
 		aria-label=Required>*</abbr></label>

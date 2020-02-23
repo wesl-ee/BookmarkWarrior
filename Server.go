@@ -40,6 +40,7 @@ type UserEditPage struct {
 type UserAddPage struct {
 	Canon string
 	Title string
+	Error *AddError
 	User WebUserProfile
 	UX *UserExperience
 	Settings *Config }
@@ -83,6 +84,12 @@ type SignupError struct {
 	ShortPassword bool
 	BadPassword bool
 	AlreadyLoggedIn bool }
+
+type AddError struct {
+	URLNoHost bool
+	URLBadScheme bool
+	URLOther bool
+}
 
 type LoginError struct {
 	DBError bool
@@ -370,6 +377,7 @@ func (ux *UserExperience) HandleUserSettings(res *ServerRes, uname, option strin
 }
 
 func (ux *UserExperience) HandleUserAdd(res *ServerRes, uname string) {
+	var procErr AddError
 	user, err := UserByName(res.DB, uname)
 	if err != nil {
 		HandleWebError(res.Writer, res.Request, http.StatusNotFound)
@@ -391,25 +399,29 @@ func (ux *UserExperience) HandleUserAdd(res *ServerRes, uname string) {
 		name := res.Request.FormValue("name")
 		url := res.Request.FormValue("url")
 
-		if !IsURL(url) {
-			HandleWebError(res.Writer, res.Request,
-				http.StatusBadRequest)
+		if uErr := IsURL(url); uErr != nil {
+			if uErr.(*URLError).BadScheme {
+				procErr = AddError{ URLBadScheme: true }
+			} else if uErr.(*URLError).NoHost {
+				procErr = AddError{ URLNoHost: true }
+			} else {
+				procErr = AddError{ URLOther: true }
+			}
+		} else {
+			b := Bookmark{
+				Username: uname,
+				Title: name,
+				URL: url }
+			err = b.Add(res.DB)
+				if err != nil {
+					HandleWebError(res.Writer, res.Request,
+						http.StatusInternalServerError)
+					log.Println(err)
+					return
+				}
+			http.Redirect(res.Writer, res.Request, "/u/" + uname, http.StatusSeeOther)
 			return
 		}
-
-		b := Bookmark{
-			Username: uname,
-			Title: name,
-			URL: url }
-		err = b.Add(res.DB)
-		if err != nil {
-			HandleWebError(res.Writer, res.Request,
-				http.StatusInternalServerError)
-			log.Println(err)
-			return
-		}
-		http.Redirect(res.Writer, res.Request, "/u/" + uname, http.StatusSeeOther)
-		return
 	}
 	page := "tmpl/user-add.html"
 	tmpl := Templates[page]
@@ -419,6 +431,7 @@ func (ux *UserExperience) HandleUserAdd(res *ServerRes, uname string) {
 	err = tmpl.Execute(res.Writer, UserAddPage{
 		Canon: Settings.Web.Canon + "u/" + uname,
 		User: webuser,
+		Error: &procErr,
 		Title: user.DisplayName + " (" + uname + ") - Add Bookmark",
 		UX: ux,
 		Settings: &Settings })
@@ -858,14 +871,6 @@ func HandleReq(w http.ResponseWriter, r *http.Request) {
 	// query := r.URL.Query()
 	hasTrailingSlash := (r.URL.Path != strings.TrimRight(r.URL.Path, "/"))
 
-	// Top-level index page should redirect to a search bar
-	/* if dispatcher == "" {
-		http.Redirect(w, r,
-			CONFIG_CANON + "search/", http.StatusMovedPermanently)
-		return
-	} */
-
-	// ws, err := LoadWebSession(r)
 	if !HasWebSession(r) {
 		InitWebSession(w, r)
 	}
@@ -880,9 +885,6 @@ func HandleReq(w http.ResponseWriter, r *http.Request) {
 
 	// Top-level index page should redirect to a search bar
 	if dispatcher == "" {
-		/* http.Redirect(w, r,
-			serveDir + "about", http.StatusMovedPermanently)
-		return */
 		ux.HandleWebIndex(res)
 		return
 	}
