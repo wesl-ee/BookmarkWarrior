@@ -230,7 +230,6 @@ func (ux *UserExperience) HandleUserSettings(res *ServerRes, uname, option strin
 
 	if !ux.LoggedIn {
 		http.Redirect(res.Writer, res.Request, "/login", http.StatusSeeOther)
-		log.Println(err)
 		return
 	}
 
@@ -817,6 +816,25 @@ func (ux *UserExperience) HandleSignupReceipt(res *ServerRes) {
 	}
 }
 
+func (ux *UserExperience) HandleShortTitle(res *ServerRes) {
+	if !ux.LoggedIn {
+		http.Redirect(res.Writer, res.Request, "/login", http.StatusSeeOther)
+		return
+	}
+
+	url, ok := res.Request.URL.Query()["webpage"]
+	if !ok {
+		HandleWebError(res.Writer, res.Request,
+			http.StatusBadRequest)
+		return }
+	shortTitle, err := ShortTitle(url[0])
+	if err != nil {
+		HandleWebError(res.Writer, res.Request,
+			http.StatusNoContent)
+		return }
+	fmt.Fprint(res.Writer, shortTitle)
+}
+
 func HandleReq(w http.ResponseWriter, r *http.Request) {
 	const serveDir string = "/"
 	dispatchers := map[string]bool {
@@ -828,6 +846,7 @@ func HandleReq(w http.ResponseWriter, r *http.Request) {
 		"about": true,
 		"mission": true,
 		"technology": true,
+		"short-title": true,
 		"u": true }
 
 	parts := strings.Split(
@@ -907,6 +926,8 @@ func HandleReq(w http.ResponseWriter, r *http.Request) {
 		}
 	case "login":
 		ux.HandleLogin(res, nil)
+	case "short-title":
+		ux.HandleShortTitle(res)
 	case "logout":
 		ux.HandleLogout(res)
 	case "u":

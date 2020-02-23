@@ -13,15 +13,16 @@
 </ul>
 <div class="tab-content add-edit">
 <form method=post>
-	<div><label for=name>Name: <abbr title=Required
-		aria-label=Required>*</abbr></label>
-	<input id=name type=text name=name></div>
 	<div><label for=url>URL: <abbr title=Required
 		aria-label=Required>*</abbr></label>
 	<input id=url type=text name=url></div>
+	<div><label for=name>Name: <abbr title=Required
+		aria-label=Required>*</abbr></label>
+	<input id=name type=text name=name></div>
 	<button type=submit>Add</button>
 </form></div>
 </main>
 <footer>{{template "Footer" .}}</footer>
+<script src="{{.Settings.Web.Canon}}static/js/bookmark-autocomplete.js"></script>
 </body>
 </html>
