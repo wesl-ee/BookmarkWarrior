@@ -16,6 +16,11 @@ cp "$PKGDIR/BookmarkWarrior" "$INSTDIR/"
 echo "Copying data to $DATADIR"
 cp -r "$PKGDIR/tmpl" "$DATADIR/"
 cp -r "$PKGDIR/static" "$DATADIR/"
-cp "$PKGDIR/Config.toml" "$DATADIR/"
+
+if [ -f "$DATADIR/Config.toml" ]; then
+	echo "Not clobbering existing $DATADIR/Config.toml"
+else
+	cp -n "$PKGDIR/Config.toml" "$DATADIR/"
+fi
 
 echo "Done!"
