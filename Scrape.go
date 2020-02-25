@@ -12,6 +12,10 @@ func ShortTitle(url string) (string, error) {
 		return "", err }
 	defer resp.Body.Close()
 
+	if resp.StatusCode != http.StatusOK {
+		return "", nil
+	}
+
 	dataInBytes, err := ioutil.ReadAll(resp.Body)
 	pageContent := string(dataInBytes)
 
