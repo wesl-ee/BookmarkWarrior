@@ -840,8 +840,8 @@ func (ux *UserExperience) HandleShortTitle(res *ServerRes) {
 		HandleWebError(res.Writer, res.Request,
 			http.StatusBadRequest)
 		return }
-	shortTitle, err := ShortTitle(url[0])
-	if err != nil {
+	shortTitle := ShortTitle(url[0])
+	if shortTitle == "" {
 		HandleWebError(res.Writer, res.Request,
 			http.StatusNoContent)
 		return }
