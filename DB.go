@@ -230,6 +230,24 @@ func (u UserProfile) ArchivedBookmarks(db *sql.DB, order *BOrder) (Bookmarks, er
 	return marks,err
 }
 
+func BookmarkByID(db *sql.DB, bID int) (Bookmark, error) {
+	var m Bookmark
+	q := `SELECT
+		BId, Username, URL, Title, Unread, Archived, AddedOn
+		FROM Bookmarks WHERE BId=?`
+	selForm, err := db.Prepare(q)
+	if err != nil { return m, err }
+	err = selForm.QueryRow(bID).Scan(
+		&m.BId,
+		&m.Username,
+		&m.URL,
+		&m.Title,
+		&m.Unread,
+		&m.Archived,
+		&m.AddedOn)
+	return m, nil
+}
+
 func (u UserProfile) UnarchivedBookmarks(db *sql.DB, order *BOrder) (Bookmarks, error) {
 	var marks []Bookmark
 	q := `SELECT

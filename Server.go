@@ -487,27 +487,16 @@ func (ux *UserExperience) HandleUserViewArchive(res *ServerRes, uname string) {
 }
 
 func (ux *UserExperience) HandleOut(res *ServerRes, bID int) {
-	u, err := UserByName(res.DB, ux.Username)
-	if err != nil {
-		HandleWebError(res.Writer, res.Request,
-			http.StatusNotFound)
-		return
-	}
-	marks, err := u.Bookmarks(res.DB)
+	mark, err := BookmarkByID(res.DB, bID)
 	if err != nil {
 		HandleWebError(res.Writer, res.Request,
 			http.StatusNotFound)
 		return
 	}
 
-	mark, isValid := marks[bID]
-	if !isValid {
-		HandleWebError(res.Writer, res.Request,
-			http.StatusNotFound)
-		return
+	if ux.Username == mark.Username {
+		mark.MarkRead(res.DB)
 	}
-
-	mark.MarkRead(res.DB)
 	http.Redirect(res.Writer, res.Request, mark.URL, http.StatusSeeOther)
 }
 
