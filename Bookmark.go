@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/url"
+	"strconv"
 )
 
 type Bookmarks []Bookmark
@@ -68,7 +69,7 @@ func (b *Bookmark) AsWebEntity() (wb WebBookmark) {
 
 	wb.BId = b.BId
 	wb.Username = b.Username
-	wb.URL = b.URL
+	wb.URL = Settings.Web.Canon + "out/" + strconv.Itoa(b.BId)
 	wb.Title = b.Title
 	wb.Unread = b.Unread
 	wb.Archived = b.Archived

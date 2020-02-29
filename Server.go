@@ -486,6 +486,31 @@ func (ux *UserExperience) HandleUserViewArchive(res *ServerRes, uname string) {
 	}
 }
 
+func (ux *UserExperience) HandleOut(res *ServerRes, bID int) {
+	u, err := UserByName(res.DB, ux.Username)
+	if err != nil {
+		HandleWebError(res.Writer, res.Request,
+			http.StatusNotFound)
+		return
+	}
+	marks, err := u.Bookmarks(res.DB)
+	if err != nil {
+		HandleWebError(res.Writer, res.Request,
+			http.StatusNotFound)
+		return
+	}
+
+	mark, isValid := marks[bID]
+	if !isValid {
+		HandleWebError(res.Writer, res.Request,
+			http.StatusNotFound)
+		return
+	}
+
+	mark.MarkRead(res.DB)
+	http.Redirect(res.Writer, res.Request, mark.URL, http.StatusSeeOther)
+}
+
 func (ux *UserExperience) HandleBMarkAction(res *ServerRes, uname string, bID int, action string) {
 	if ux.Username != uname {
 		HandleWebError(res.Writer, res.Request, http.StatusForbidden)
@@ -860,6 +885,7 @@ func HandleReq(w http.ResponseWriter, r *http.Request) {
 		"mission": true,
 		"technology": true,
 		"short-title": true,
+		"out": true,
 		"u": true }
 
 	parts := strings.Split(
@@ -932,6 +958,15 @@ func HandleReq(w http.ResponseWriter, r *http.Request) {
 		ux.HandleShortTitle(res)
 	case "logout":
 		ux.HandleLogout(res)
+	case "out":
+		switch(len(args)) {
+		case 1:
+			bID, err := strconv.Atoi(args[0])
+			if err != nil {
+				HandleWebError(w, r, http.StatusBadRequest)
+			}
+			ux.HandleOut(res, bID)
+		}
 	case "u":
 		switch(len(args)) {
 		case 3:
