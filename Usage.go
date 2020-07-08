@@ -38,6 +38,7 @@ func (u *UsageStat) AsBarGraph() (b Bargraph) {
 		d.Width = strconv.Itoa(int(ratio*100)) + "%"
 		d.Title = u.Titles[i]
 		b.Data = append(b.Data, d)
+		if (i >= 15) { b.Data = b.Data[1:]; }
 	}
 	return b
 }
