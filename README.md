@@ -34,8 +34,8 @@ Create a PayPal to process account activation transactions and ensure you have
 Go installed on your machine, then do the following:
 
 ```
-go get https://github.com/wesleycoakley/BookmarkWarrior
-cd $GOPATH/src/github.com/wesleycoakley/BookmarkWarrior
+go get github.com/wesleycoakley/BookmarkWarrior
+cd $(go env GOPATH)/src/github.com/wesleycoakley/BookmarkWarrior
 cp Config.example.toml Config.toml
 # Edit config as necessary
 # ...

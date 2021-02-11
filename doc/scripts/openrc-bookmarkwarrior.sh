@@ -4,6 +4,7 @@ pidfile=/var/run/bmw.pid
 name="Bookmark Warrior"
 datadir=/usr/local/share/BookmarkWarrior
 description="Bookmark Warrior"
+runas="bookmarkwarrior"
 
 depend() {
 	need net
@@ -13,7 +14,8 @@ depend() {
 start() {
 	ebegin "BookmarkWarrior is spinning up"
 	start-stop-daemon --start --exec /usr/local/bin/BookmarkWarrior \
-		--background --pidfile "$pidfile" --chdir "$datadir"
+		--group "$runas" --user "$runas" --background --pidfile "$pidfile" \
+		--chdir "$datadir"
 	eend $?
 }
 

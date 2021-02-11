@@ -1,0 +1,12 @@
+[Unit]
+Description=Bookmarkwarrior
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/BookmarkWarrior
+WorkingDirectory=/usr/local/share/BookmarkWarrior
+User=bookmarkwarrior
+Group=bookmarkwarrior
+
+[Install]
+WantedBy=multi-user.target
